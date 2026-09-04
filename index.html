@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Konsolidasi Analyzer — AI Agent & Review Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #F5F2EB;
+    --panel: #FFFFFF;
+    --ink: #221E18;
+    --ink-soft: #5C564A;
+    --ink-muted: #8E8677;
+    --forest: #1B4332;
+    --forest-deep: #0F2A1D;
+    --forest-light: #2D6A4F;
+    --gold: #B8902E;
+    --gold-soft: #F4EEDC;
+    --sage: #52796F;
+    --sage-bg: #E8F0EB;
+    --danger: #A6402A;
+    --danger-bg: #F9EBE7;
+    --warn: #B8860B;
+    --warn-bg: #FBF4E2;
+    --ok: #2D6A4F;
+    --ok-bg: #E4EFE6;
+    --line: #E2DBD0;
+    --line-subtle: #EDE7DD;
+    --bubble-agent: #F4EFEB;
+    --bubble-user: #1B4332;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+  h1, h2, h3, h4 { font-family: 'Source Serif 4', Georgia, serif; font-weight: 600; }
+  .num, input, .code-font { font-family: 'IBM Plex Mono', monospace; }
+
+  /* App Shell & Header */
+  .app-wrap {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 16px 22px 50px;
+  }
+
+  header.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 14px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .title-group h1 {
+    font-size: 21px;
+    color: var(--forest-deep);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .badge-poc {
+    font-size: 10.5px;
+    background: var(--gold-soft);
+    color: #7A5B15;
+    border: 1px solid #DFCF9B;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+  }
+  .title-group p {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-top: 3px;
+  }
+
+  /* View Mode Switcher */
+  .view-switcher {
+    display: flex;
+    background: #EAE3D5;
+    padding: 3px;
+    border-radius: 7px;
+    gap: 2px;
+  }
+  .view-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 13px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all .15s ease;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .view-btn.active {
+    background: var(--panel);
+    color: var(--forest-deep);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .view-btn:hover:not(.active) {
+    color: var(--ink);
+  }
+
+  /* Layout Containers */
+  .workspace-grid {
+    display: grid;
+    gap: 20px;
+    transition: all .2s ease;
+  }
+  .workspace-grid.mode-split {
+    grid-template-columns: 440px 1fr;
+  }
+  .workspace-grid.mode-chat {
+    grid-template-columns: minmax(320px, 800px);
+    justify-content: center;
+  }
+  .workspace-grid.mode-dashboard {
+    grid-template-columns: 1fr;
+  }
+  .workspace-grid.mode-data {
+    grid-template-columns: 1fr;
+  }
+
+  /* Panels */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 2px rgba(33, 27, 20, 0.03);
+  }
+  .panel:last-child { margin-bottom: 0; }
+  .panel h3 {
+    font-size: 14.5px;
+    color: var(--forest-deep);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .panel h3 span {
+    font-size: 11.5px;
+    color: var(--ink-muted);
+    font-weight: 400;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  /* ================= CHAT COMPONENT ================= */
+  .chat-pane {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 120px);
+    min-height: 620px;
+    position: sticky;
+    top: 14px;
+    overflow: hidden;
+  }
+  .chat-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    background: #FAF8F3;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chat-agent-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .agent-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: var(--forest);
+    color: #F8F5EE;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .agent-meta h4 {
+    font-size: 13.5px;
+    color: var(--forest-deep);
+  }
+  .agent-meta span {
+    font-size: 11px;
+    color: var(--sage);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .pulse-dot {
+    width: 6px;
+    height: 6px;
+    background: #3D7A56;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .chat-actions-top {
+    display: flex;
+    gap: 6px;
+  }
+  .btn-ghost-sm {
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .btn-ghost-sm:hover { background: #F6F3EC; }
+
+  .chat-history {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: #FCFAF6;
+  }
+
+  .chat-msg {
+    display: flex;
+    gap: 10px;
+    max-width: 96%;
+    animation: fadeIn .2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .chat-msg.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+  .msg-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .chat-msg.agent .msg-avatar { background: var(--forest); color: #FFF; }
+  .chat-msg.user .msg-avatar { background: #8E8677; color: #FFF; }
+
+  .msg-bubble {
+    padding: 11px 14px;
+    border-radius: 8px;
+    font-size: 12.8px;
+    line-height: 1.55;
+    position: relative;
+  }
+  .chat-msg.agent .msg-bubble {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  }
+  .chat-msg.user .msg-bubble {
+    background: var(--forest);
+    color: #F8F5EE;
+  }
+
+  /* Step-by-step thinking block */
+  .reasoning-box {
+    background: #F4EFE6;
+    border-left: 3px solid var(--gold);
+    padding: 8px 11px;
+    border-radius: 0 5px 5px 0;
+    margin: 8px 0;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+  }
+  .reasoning-step {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 0;
+  }
+  .reasoning-step.done { color: var(--ok); }
+  .reasoning-step.active { color: var(--forest); font-weight: 600; }
+
+  /* Interactive Chat Cards */
+  .chat-card {
+    background: #FAF8F2;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-top: 9px;
+  }
+  .chat-card-title {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--forest-deep);
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .chat-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    font-size: 11.8px;
+  }
+  .chat-card-stat {
+    background: #FFF;
+    padding: 6px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--line-subtle);
+  }
+  .chat-card-stat .lbl { font-size: 10.5px; color: var(--ink-muted); }
+  .chat-card-stat .val { font-weight: 600; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+
+  .chat-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    background: var(--forest);
+    color: #F8F5EE;
+    border: none;
+    padding: 7px 13px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .chat-cta-btn:hover { background: var(--forest-deep); }
+
+  /* Suggested Quick Prompts */
+  .quick-prompts {
+    padding: 8px 14px;
+    background: #FAF8F3;
+    border-top: 1px solid var(--line);
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: thin;
+  }
+  .chip-prompt {
+    background: #FFF;
+    border: 1px solid var(--line);
+    padding: 4px 9px;
+    border-radius: 14px;
+    font-size: 11px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all .15s;
+    flex-shrink: 0;
+  }
+  .chip-prompt:hover {
+    border-color: var(--forest);
+    color: var(--forest-deep);
+    background: #F4EFEB;
+  }
+
+  /* Chat Input */
+  .chat-input-area {
+    padding: 12px 14px;
+    border-top: 1px solid var(--line);
+    background: #FFF;
+    display: flex;
+    gap: 8px;
+  }
+  .chat-input {
+    flex: 1;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px 11px;
+    font-size: 12.8px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    outline: none;
+    background: #FAF8F4;
+  }
+  .chat-input:focus { border-color: var(--forest); background: #FFF; }
+  .chat-send-btn {
+    background: var(--forest);
+    color: #FFF;
+    border: none;
+    padding: 0 15px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .chat-send-btn:hover { background: var(--forest-deep); }
+  .chat-send-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ================= DASHBOARD & REVIEW WORKSPACE ================= */
+  .dashboard-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  /* Review Status Bar */
+  .review-status-banner {
+    background: #FFF;
+    border: 1px solid var(--line);
+    border-left: 5px solid var(--gold);
+    border-radius: 7px;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .review-status-info h3 {
+    font-size: 15px;
+    color: var(--forest-deep);
+    margin-bottom: 3px;
+  }
+  .review-status-info p {
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .review-counts {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .count-pill {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .count-pill.pending { background: var(--warn-bg); color: var(--warn); border: 1px solid #EADBBA; }
+  .count-pill.needs-clarification { background: #E7EEF5; color: #1D548F; border: 1px solid #C9DCED; }
+  .count-pill.audit-finding { background: var(--danger-bg); color: var(--danger); border: 1px solid #E8C8C0; }
+  .count-pill.approved { background: var(--ok-bg); color: var(--ok); border: 1px solid #CBE0D1; }
+
+  .signoff-btn {
+    background: var(--forest);
+    color: #F8F5EE;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .signoff-btn:hover { background: var(--forest-deep); }
+
+  /* KPI Summary Grid */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  .kpi-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 12px 14px;
+    position: relative;
+  }
+  .kpi-title {
+    font-size: 11px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .kpi-val {
+    font-size: 18px;
+    font-weight: 600;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--forest-deep);
+  }
+  .kpi-sub {
+    font-size: 11.2px;
+    color: var(--ink-soft);
+    margin-top: 3px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .kpi-tag {
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+  .kpi-tag.positive { background: var(--ok-bg); color: var(--ok); }
+  .kpi-tag.negative { background: var(--danger-bg); color: var(--danger); }
+  .kpi-tag.neutral { background: #EEE; color: var(--ink-soft); }
+
+  /* Profit Contribution Bar */
+  .contribution-strip {
+    height: 16px;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    background: #EAE3D5;
+    margin: 10px 0 8px;
+  }
+  .strip-seg {
+    height: 100%;
+    position: relative;
+    transition: width .3s ease;
+  }
+  .strip-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+  .strip-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+  }
+
+  /* REVIEW SECTION - CARDS THAT NEED TO BE REVIEWED */
+  .review-box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .review-box-header h3 {
+    font-size: 16px;
+    color: var(--forest-deep);
+  }
+  .review-filter-group {
+    display: flex;
+    gap: 6px;
+  }
+  .filter-btn {
+    border: 1px solid var(--line);
+    background: #FFF;
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    color: var(--ink-soft);
+  }
+  .filter-btn.active {
+    background: var(--forest);
+    color: #FFF;
+    border-color: var(--forest);
+  }
+
+  .review-item-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #FFF;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: all .2s;
+  }
+  .review-item-card.is-high { border-left: 5px solid var(--danger); }
+  .review-item-card.is-med { border-left: 5px solid var(--warn); }
+  .review-item-card.is-low { border-left: 5px solid var(--sage); }
+
+  .review-item-top {
+    padding: 12px 16px;
+    background: #FAF8F4;
+    border-bottom: 1px solid var(--line-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .review-item-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .sev-tag {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 12px;
+  }
+  .sev-tag.high { background: var(--danger-bg); color: var(--danger); }
+  .sev-tag.med { background: var(--warn-bg); color: var(--warn); }
+  .sev-tag.low { background: var(--sage-bg); color: var(--sage); }
+
+  .review-item-body {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .review-detail-text {
+    font-size: 12.8px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .review-rationale {
+    background: #F4EFE6;
+    border-radius: 5px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--forest-deep);
+    border-left: 3px solid var(--forest);
+  }
+  .review-rationale strong { color: var(--forest-deep); }
+
+  .review-action-row {
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line);
+    display: grid;
+    grid-template-columns: 220px 1fr auto;
+    gap: 10px;
+    align-items: center;
+  }
+  @media(max-width:850px){
+    .review-action-row { grid-template-columns: 1fr; }
+  }
+
+  .status-select {
+    padding: 6px 9px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    font-size: 12px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 500;
+    background: #FFF;
+    outline: none;
+    cursor: pointer;
+  }
+  .status-select:focus { border-color: var(--forest); }
+
+  .reviewer-note-input {
+    padding: 6px 9px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    font-size: 12px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: #FCFAF6;
+    width: 100%;
+  }
+  .reviewer-note-input:focus { border-color: var(--forest); background: #FFF; }
+
+  .btn-save-review {
+    padding: 6px 12px;
+    background: #FAF8F2;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .btn-save-review:hover { background: #EEE8DB; color: var(--ink); }
+
+  /* Benchmark Section */
+  .benchmark-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .bench-card {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: #FAF8F4;
+  }
+  .bench-card h5 {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 5px;
+  }
+  .bench-vals {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+  .bench-vals .entity { font-weight: 600; font-family: 'IBM Plex Mono', monospace; }
+  .bench-vals .ind { color: var(--ink-soft); font-family: 'IBM Plex Mono', monospace; }
+
+  /* Data Table Section */
+  .tablewrap {
+    overflow-x: auto;
+  }
+  table {
+    border-collapse: collapse;
+    font-size: 11.8px;
+    width: 100%;
+    min-width: 1080px;
+  }
+  th {
+    text-align: left;
+    padding: 8px 7px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    border-bottom: 2px solid var(--line);
+    white-space: nowrap;
+    font-size: 11px;
+    background: #FAF8F4;
+  }
+  td {
+    padding: 6px 7px;
+    border-bottom: 1px solid #EFEAE0;
+  }
+  td.name {
+    font-weight: 600;
+    white-space: nowrap;
+    font-size: 12px;
+    color: var(--forest-deep);
+  }
+  td input {
+    width: 78px;
+    padding: 4px 6px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-size: 11.5px;
+    background: #FCFAF4;
+  }
+  td input:focus {
+    outline: 1.5px solid var(--forest);
+    background: #FFF;
+  }
+
+  /* Auditor Sign-off Modal / Box */
+  .signoff-box {
+    background: #FAF8F3;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 16px 20px;
+    margin-top: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .signoff-meta {
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .signoff-meta strong { color: var(--forest-deep); }
+
+  /* Footnote & honesty statement */
+  .note {
+    font-size: 11.3px;
+    color: var(--ink-muted);
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+
+  /* Print Styles for Review Report */
+  @media print {
+    body { background: #FFF; font-size: 10pt; }
+    .chat-pane, .view-switcher, .chat-input-area, .quick-prompts, .btn-save-review, .signoff-btn { display: none !important; }
+    .workspace-grid { display: block !important; }
+    .panel, .review-item-card { break-inside: avoid; border: 1px solid #CCC; box-shadow: none; }
+    .review-action-row { display: block; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-wrap">
+
+  <!-- Header & Mode Switcher -->
+  <header class="app-header">
+    <div class="title-group">
+      <h1>
+        Konsolidasi Analyzer & Review Dashboard
+        <span class="badge-poc">AI Forensic Copilot</span>
+      </h1>
+      <p>Sistem otomatisasi telaah konsolidasi laporan keuangan, deteksi anomali PSAK, dan tracking review auditor internal.</p>
+    </div>
+    <div class="view-switcher">
+      <button class="view-btn active" id="btnModeSplit" onclick="switchMode('split')">
+        <span>⚖️</span> Split View
+      </button>
+      <button class="view-btn" id="btnModeChat" onclick="switchMode('chat')">
+        <span>💬</span> Chat Agent
+      </button>
+      <button class="view-btn" id="btnModeDashboard" onclick="switchMode('dashboard')">
+        <span>📊</span> Review Dashboard
+      </button>
+      <button class="view-btn" id="btnModeData" onclick="switchMode('data')">
+        <span>📝</span> Input Data
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="workspace-grid mode-split" id="workspaceGrid">
+
+    <!-- LEFT / CHAT PANEL -->
+    <div class="chat-pane" id="chatPane">
+      <div class="chat-header">
+        <div class="chat-agent-info">
+          <div class="agent-avatar">AI</div>
+          <div class="agent-meta">
+            <h4>Forensic Auditor Agent</h4>
+            <span><span class="pulse-dot"></span> Aktif & Terhubung ke Rule Engine</span>
+          </div>
+        </div>
+        <div class="chat-actions-top">
+          <button class="btn-ghost-sm" onclick="resetChat()" title="Mulai ulang percakapan">↺ Reset Chat</button>
+        </div>
+      </div>
+
+      <!-- Scrollable Message History -->
+      <div class="chat-history" id="chatHistory">
+        <!-- Initial Agent Message -->
+        <div class="chat-msg agent">
+          <div class="msg-avatar">AI</div>
+          <div class="msg-bubble">
+            Halo! Saya asisten forensic auditor untuk konsolidasi laporan keuangan <strong>Yayasan dan 5 Anak Perusahaan</strong>.
+            <br><br>
+            Saya telah memuat data keuangan terkini. Anda dapat menanyakan apapun seputar konsolidasi, meminta analisa risiko, atau klik salah satu instruksi cepat di bawah untuk langsung memproses dan menampilkan <strong>Review Dashboard</strong>.
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Prompt Suggestions -->
+      <div class="quick-prompts">
+        <button class="chip-prompt" onclick="sendQuickPrompt('Jalankan analisis menyeluruh dan tampilkan dashboard temuan yang perlu saya review!')">
+          📊 Jalankan Analisis & Tampilkan Dashboard
+        </button>
+        <button class="chip-prompt" onclick="sendQuickPrompt('Periksa kejanggalan alokasi laba NCI pada PT Anak II')">
+          ⚠️ Cek Alokasi NCI
+        </button>
+        <button class="chip-prompt" onclick="sendQuickPrompt('Periksa lonjakan piutang related-party vs pertumbuhan revenue')">
+          🏢 Cek Transaksi Afiliasi
+        </button>
+        <button class="chip-prompt" onclick="sendQuickPrompt('Bandingkan rasio DER dan ROA entitas dengan benchmark OJK')">
+          📈 Benchmark Industri OJK
+        </button>
+        <button class="chip-prompt" onclick="sendQuickPrompt('Buat ringkasan eksekutif untuk komite audit')">
+          ✍️ Ringkasan Komite Audit
+        </button>
+      </div>
+
+      <!-- Chat Input Field -->
+      <form class="chat-input-area" onsubmit="handleChatSubmit(event)">
+        <input type="text" id="chatInput" class="chat-input" placeholder="Ketik pertanyaan atau instruksi telaah laporan..." autocomplete="off">
+        <button type="submit" id="chatSendBtn" class="chat-send-btn">Kirim</button>
+      </form>
+    </div>
+
+    <!-- RIGHT / DASHBOARD & REVIEW WORKSPACE -->
+    <div class="dashboard-pane" id="dashboardPane">
+
+      <!-- 1. Review Status Tracker Banner -->
+      <div class="review-status-banner">
+        <div class="review-status-info">
+          <h3>Hasil yang Perlu Di-Review (Review Workspace)</h3>
+          <p id="reviewStatusSubtitle">Memuat data dan anomali konsolidasi...</p>
+        </div>
+        <div class="review-counts" id="reviewCounts">
+          <div class="count-pill pending" id="pillPending">⏳ 0 Belum Di-review</div>
+          <div class="count-pill needs-clarification" id="pillClarify">❓ 0 Butuh Klarifikasi</div>
+          <div class="count-pill audit-finding" id="pillFinding">🚨 0 Temuan Audit</div>
+          <div class="count-pill approved" id="pillApproved">✅ 0 Disetujui</div>
+        </div>
+        <button class="signoff-btn" onclick="printReviewReport()">
+          <span>🖨️</span> Cetak / Simpan Laporan
+        </button>
+      </div>
+
+      <!-- 2. Consolidated Financial Overview (KPIs) -->
+      <div class="panel">
+        <h3>
+          Indikator Kunci Konsolidasi (CY vs PY)
+          <span id="asOfTag">Data Terkini Tahun Berjalan</span>
+        </h3>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-title">Revenue Konsolidasi</div>
+            <div class="kpi-val" id="kpiRev">—</div>
+            <div class="kpi-sub">
+              <span>PY: <span id="kpiRevPY" class="code-font">—</span></span>
+              <span class="kpi-tag" id="tagRevGrowth">—</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Laba Bersih Konsolidasi</div>
+            <div class="kpi-val" id="kpiNI">—</div>
+            <div class="kpi-sub">
+              <span>PY: <span id="kpiNIPY" class="code-font">—</span></span>
+              <span class="kpi-tag" id="tagNIGrowth">—</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Porsi Laba NCI</div>
+            <div class="kpi-val" id="kpiNCI">—</div>
+            <div class="kpi-sub">
+              <span>Attributable to Induk:</span>
+              <span class="code-font" id="kpiParentNI">—</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Total Aset Konsolidasi</div>
+            <div class="kpi-val" id="kpiAssets">—</div>
+            <div class="kpi-sub">
+              <span>ROA Konsolidasi:</span>
+              <span class="code-font" id="kpiROA">—</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">DER Konsolidasi</div>
+            <div class="kpi-val" id="kpiDER">—</div>
+            <div class="kpi-sub">
+              <span>PY: <span id="kpiDERPY" class="code-font">—</span></span>
+              <span class="kpi-tag" id="tagDERStatus">—</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">ROE Attributable to Parent</div>
+            <div class="kpi-val" id="kpiROE">—</div>
+            <div class="kpi-sub">
+              <span>Ekuitas Induk:</span>
+              <span class="code-font" id="kpiParentEq">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual Contribution Bar -->
+        <div style="margin-top: 18px;">
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--ink-soft); font-weight:500;">
+            <span>Proporsi Kontribusi Laba Bersih per Entitas</span>
+            <span id="contrSummary">Total 6 Entitas</span>
+          </div>
+          <div class="contribution-strip" id="contrStrip"></div>
+          <div class="strip-legend" id="contrLegend"></div>
+        </div>
+      </div>
+
+      <!-- 3. HASIL YANG PERLU DI-REVIEW (ITEMS REQUIRING REVIEW) -->
+      <div class="panel" id="reviewItemsPanel">
+        <div class="review-box-header">
+          <div>
+            <h3>Daftar Temuan & Anomali yang Perlu Di-Review</h3>
+            <p style="font-size:12px; color:var(--ink-soft); margin-top:2px;">
+              Diperiksa oleh Rule Engine & AI Forensic Analyst. Pilih status penanganan dan masukkan catatan reviewer.
+            </p>
+          </div>
+          <div class="review-filter-group">
+            <button class="filter-btn active" onclick="filterReviewItems('all')">Semua (<span id="cntAll">0</span>)</button>
+            <button class="filter-btn" onclick="filterReviewItems('high')">Kritis (<span id="cntHigh">0</span>)</button>
+            <button class="filter-btn" onclick="filterReviewItems('pending')">Belum Selesai (<span id="cntPending">0</span>)</button>
+          </div>
+        </div>
+
+        <div id="reviewCardsContainer">
+          <!-- Dynamic Review Cards injected here -->
+        </div>
+      </div>
+
+      <!-- 4. Benchmarking Sektoral & OJK -->
+      <div class="panel">
+        <h3>
+          Analisis Komparasi Sektor Keuangan Mikro & Multifinance
+          <span>Sumber: Statistik OJK / Data Industri</span>
+        </h3>
+        <p style="font-size:12px; color:var(--ink-soft); line-height:1.5;">
+          Perbandingan kinerja konsolidasi entitas terhadap benchmark rata-rata industri multifinance dan pembiayaan mikro nasional:
+        </p>
+
+        <div class="benchmark-grid">
+          <div class="bench-card">
+            <h5>Return on Asset (ROA)</h5>
+            <div class="bench-vals">
+              <span>Konsolidasi:</span>
+              <span class="entity" id="benchROAEntity">4.8%</span>
+            </div>
+            <div class="bench-vals">
+              <span>Benchmark OJK:</span>
+              <span class="ind">3.5% – 5.2%</span>
+            </div>
+            <div style="margin-top:6px; font-size:11px; color:var(--ok);">
+              ✓ Dalam rentang sehat industri pembiayaan mikro
+            </div>
+          </div>
+
+          <div class="bench-card">
+            <h5>Debt to Equity Ratio (DER)</h5>
+            <div class="bench-vals">
+              <span>Konsolidasi:</span>
+              <span class="entity" id="benchDEREntity">1.02x</span>
+            </div>
+            <div class="bench-vals">
+              <span>Batas Maks OJK (POJK):</span>
+              <span class="ind">Max 5.0x</span>
+            </div>
+            <div style="margin-top:6px; font-size:11px; color:var(--ok);">
+              ✓ Solvabilitas sangat konservatif & aman
+            </div>
+          </div>
+
+          <div class="bench-card">
+            <h5>Pertumbuhan Laba YoY</h5>
+            <div class="bench-vals">
+              <span>Konsolidasi:</span>
+              <span class="entity" id="benchNIGrowth">+14.2%</span>
+            </div>
+            <div class="bench-vals">
+              <span>Rata-rata Sektor:</span>
+              <span class="ind">+8.0% – +11.5%</span>
+            </div>
+            <div style="margin-top:6px; font-size:11px; color:var(--ok);">
+              ✓ Outperforming rata-rata industri pembiayaan
+            </div>
+          </div>
+
+          <div class="bench-card">
+            <h5>Rasio Transaksi Afiliasi</h5>
+            <div class="bench-vals">
+              <span>Total Piutang Afiliasi:</span>
+              <span class="entity" id="benchRPTotal">241.0 M</span>
+            </div>
+            <div class="bench-vals">
+              <span>% dari Total Aset:</span>
+              <span class="ind" id="benchRPPct">4.3%</span>
+            </div>
+            <div style="margin-top:6px; font-size:11px; color:var(--warn);">
+              ⚠️ Perlu monitoring khusus konsentrasi PT Anak II
+            </div>
+          </div>
+        </div>
+
+        <div id="aiIndustrySummary" style="margin-top:12px; font-size:12px; background:#F4EFEB; padding:10px 14px; border-radius:5px; line-height:1.6; color:var(--forest-deep);">
+          <strong>Analisa Sektoral Agent:</strong> Portofolio konsolidasi memiliki leverage (DER 1.02x) yang jauh lebih konservatif dibanding batas POJK (5x), memberikan ruang likuiditas luas. Namun, lonjakan piutang berelasi pada entitas anak dengan NCI tinggi (PT Anak II) perlu diperiksa agar tidak terjadi pergeseran risiko atau subsidi silang yang merugikan pemegang saham non-pengendali.
+        </div>
+      </div>
+
+      <!-- 5. Auditor Sign-Off & Formal Conclusion -->
+      <div class="panel">
+        <h3>Lembar Pengesahan Telaah & Sign-off Reviewer</h3>
+        <div class="signoff-box">
+          <div class="signoff-meta">
+            <div>Status Telaah: <strong id="signoffStatusText">Dalam Proses Review</strong></div>
+            <div style="margin-top:3px;">Reviewer: <strong>Forensic Accounting Team / Internal Audit</strong> &bull; As-Of: <span id="signoffDate">—</span></div>
+            <div style="margin-top:3px;" id="signoffSummaryDetail">2 dari 4 temuan telah direspon.</div>
+          </div>
+          <button class="signoff-btn" id="btnFinalSignoff" onclick="toggleSignoff()">
+            <span id="signoffIcon">✍️</span> <span id="signoffBtnText">Tandai Review Selesai & Sign-off</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 6. Input Data Tabel (Editable) -->
+      <div class="panel" id="inputTablePanel">
+        <h3>
+          Data Finansial Entitas (Dapat Dimodifikasi Langsung)
+          <span>Ubah angka di bawah untuk mensimulasikan dampak ke konsolidasi & anomali</span>
+        </h3>
+        <div class="tablewrap">
+          <table id="inputTable">
+            <thead>
+              <tr>
+                <th>Entitas</th><th>NCI %</th>
+                <th>Revenue CY</th><th>Revenue PY</th>
+                <th>Laba Bersih CY</th><th>Laba Bersih PY</th>
+                <th>Aset CY</th>
+                <th>Liabilitas CY</th><th>Liabilitas PY</th>
+                <th>Ekuitas CY</th><th>Ekuitas PY</th>
+                <th>Piutang Relasi CY</th><th>Piutang Relasi PY</th>
+                <th>Laba NCI (Dilaporkan)</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:10px; display:flex; justify-content:flex-end; gap:8px;">
+          <button class="btn-ghost-sm" onclick="resetToDefaultData()">↺ Kembalikan Data Default</button>
+          <button class="btn-ghost-sm" style="background:var(--forest); color:#FFF;" onclick="recalculateAll(true)">🔄 Hitung Ulang & Sync ke Chat</button>
+        </div>
+      </div>
+
+      <div class="note">
+        <b>Transparansi & Batasan Sistem:</b> Eliminasi transaksi intercompany disederhanakan untuk keperluan analisis awal; rasio solvabilitas dan likuiditas mengacu pada data neraca tahun berjalan (CY) dan tahun lalu (PY); penilaian anomali dievaluasi berdasarkan ambang deviasi matematis (>10% alokasi NCI, >30% lonjakan piutang berelasi YoY, dan kompresi marjin >5pp) yang diverifikasi oleh agent penalaran forensik.
+      </div>
+
+    </div> <!-- End Dashboard Pane -->
+
+  </div> <!-- End Workspace Grid -->
+
+</div> <!-- End App Wrap -->
+
+<script>
+/* ================= DATA & STATE MANAGEMENT ================= */
+const DEFAULT_ENTITIES = [
+  {name:"Yayasan (Induk)", role:"parent", nci:0, revCY:820, revPY:770, niCY:64, niPY:60, assetsCY:1450, liabCY:610, liabPY:520, eqCY:840, eqPY:790, rpCY:40, rpPY:36, reportedNci:null},
+  {name:"PT Anak I — Pengendali", role:"controlling", nci:0, revCY:1240, revPY:1120, niCY:118, niPY:104, assetsCY:1980, liabCY:1120, liabPY:940, eqCY:860, eqPY:760, rpCY:55, rpPY:50, reportedNci:null},
+  {name:"PT Anak II", role:"nci", nci:35, revCY:640, revPY:610, niCY:52, niPY:49, assetsCY:900, liabCY:430, liabPY:390, eqCY:470, eqPY:430, rpCY:88, rpPY:34, reportedNci:24.4},
+  {name:"PT Anak III", role:"nci", nci:40, revCY:510, revPY:495, niCY:31, niPY:33, assetsCY:740, liabCY:390, liabPY:330, eqCY:350, eqPY:340, rpCY:26, rpPY:24, reportedNci:12.4},
+  {name:"PT Anak IV", role:"nci", nci:22, revCY:380, revPY:360, niCY:41, niPY:26, assetsCY:520, liabCY:210, liabPY:200, eqCY:310, eqPY:280, rpCY:18, rpPY:16, reportedNci:9.0},
+  {name:"PT Anak V", role:"nci", nci:30, revCY:295, revPY:280, niCY:19, niPY:18, assetsCY:410, liabCY:180, liabPY:165, eqCY:230, eqPY:220, rpCY:12, rpPY:11, reportedNci:5.7}
+];
+
+let entities = JSON.parse(JSON.stringify(DEFAULT_ENTITIES));
+const fields = ["nci","revCY","revPY","niCY","niPY","assetsCY","liabCY","liabPY","eqCY","eqPY","rpCY","rpPY","reportedNci"];
+
+// Review items state: store user review actions (status, comments)
+let reviewDecisions = {};
+let currentFlags = [];
+let currentMetrics = {};
+let isSignedOff = false;
+let activeFilter = 'all';
+
+/* ================= HELPER FUNCTIONS ================= */
+function pct(a,b){ if(!b) return null; return (a-b)/Math.abs(b); }
+function fmtPct(x){ return x===null||isNaN(x) ? "—" : (x>0?"+":"") + (x*100).toFixed(1)+"%"; }
+function fmtNum(x){ return x===null||isNaN(x) ? "—" : x.toLocaleString('id-ID',{maximumFractionDigits:1}); }
+
+function getEntityColor(index){
+  const palette = ["#1B4332", "#2D6A4F", "#52796F", "#B8902E", "#D4A373", "#8E8677"];
+  return palette[index % palette.length];
+}
+
+/* ================= CALCULATION ENGINE ================= */
+function computeMetrics(ent){
+  const sum = (k)=> ent.reduce((s,e)=> s + (e[k]||0), 0);
+  const consRevCY = sum("revCY"), consRevPY = sum("revPY");
+  const consNiCY = sum("niCY"), consNiPY = sum("niPY");
+  const consAssetsCY = sum("assetsCY");
+  const consLiabCY = sum("liabCY"), consLiabPY = sum("liabPY");
+  const consEqCY = sum("eqCY"), consEqPY = sum("eqPY");
+  const consRpCY = sum("rpCY"), consRpPY = sum("rpPY");
+
+  let nciProfitShare = 0, nciEquityShare = 0;
+  ent.forEach(e=>{
+    if(e.nci > 0){
+      nciProfitShare += (e.niCY||0) * (e.nci/100);
+      nciEquityShare += (e.eqCY||0) * (e.nci/100);
+    }
+  });
+
+  const parentNI = consNiCY - nciProfitShare;
+  const parentEquity = consEqCY - nciEquityShare;
+
+  const roaCY = consAssetsCY ? (consNiCY / consAssetsCY) : 0;
+  const roeParent = parentEquity ? (parentNI / parentEquity) : 0;
+  const derCY = consEqCY ? (consLiabCY / consEqCY) : 0;
+  const derPY = consEqPY ? (consLiabPY / consEqPY) : 0;
+  const revGrowth = pct(consRevCY, consRevPY);
+  const niGrowth = pct(consNiCY, consNiPY);
+
+  const contribution = ent.map((e, idx)=>({
+    name: e.name,
+    niCY: e.niCY,
+    share: consNiCY ? (e.niCY / consNiCY) : 0,
+    color: getEntityColor(idx)
+  }));
+
+  return {
+    consRevCY, consRevPY, consNiCY, consNiPY,
+    consAssetsCY, consLiabCY, consLiabPY, consEqCY, consEqPY, consRpCY, consRpPY,
+    nciProfitShare, parentNI, parentEquity,
+    roaCY, roeParent, derCY, derPY,
+    revGrowth, niGrowth, contribution
+  };
+}
+
+function runAnomalyRules(ent, m){
+  const flags = [];
+  ent.forEach(e=>{
+    // 1. NCI profit allocation mismatch
+    if(e.nci > 0 && e.reportedNci !== null && !isNaN(e.reportedNci)){
+      const computedShare = e.niCY * (e.nci/100);
+      const diff = pct(e.reportedNci, computedShare);
+      if(diff !== null && Math.abs(diff) > 0.08){
+        const isOver = e.reportedNci > computedShare;
+        flags.push({
+          id: "nci-" + e.name.replace(/\s+/g,'-'),
+          entity: e.name,
+          category: "Alokasi NCI & PSAK 65",
+          severity: Math.abs(diff) > 0.2 ? "high" : "med",
+          title: `Ketidaksesuaian Alokasi Laba ke NCI — ${e.name}`,
+          detail: `NCI tertera ${e.nci}% dari laba bersih ${fmtNum(e.niCY)} M seharusnya adalah ${fmtNum(computedShare)} M. Namun pada laporan tercatat dialokasikan sebesar ${fmtNum(e.reportedNci)} M (terdapat selisih ${fmtPct(diff)} atau ${fmtNum(Math.abs(e.reportedNci - computedShare))} M).`,
+          impact: isOver ? "Potensi penyajian laba induk terlalu rendah (understated parent income) atau beban dividen terselubung." : "Potensi hak pemegang saham minoritas dirugikan (NCI understated).",
+          rationale: `Sesuai PSAK 65, alokasi laba periode berjalan kepada pemegang saham non-pengendali wajib mencerminkan proporsi kepemilikan efektif kecuali terdapat instrumen hibrida / saham preferen yang sah.`
+        });
+      }
+    }
+
+    // 2. Related-party receivable growing far faster than revenue
+    const rpGrowth = pct(e.rpCY, e.rpPY);
+    const revGrowth = pct(e.revCY, e.revPY);
+    if(rpGrowth !== null && revGrowth !== null && (rpGrowth - revGrowth) > 0.30){
+      const isExtreme = (rpGrowth - revGrowth) > 0.70;
+      flags.push({
+        id: "rp-" + e.name.replace(/\s+/g,'-'),
+        entity: e.name,
+        category: "Transaksi Afiliasi (Related-Party)",
+        severity: isExtreme ? "high" : "med",
+        title: `Lonjakan Piutang Relasi Tidak Sebanding dengan Revenue — ${e.name}`,
+        detail: `Piutang pihak berelasi melonjak dari ${fmtNum(e.rpPY)} M menjadi ${fmtNum(e.rpCY)} M (${fmtPct(rpGrowth)} YoY), sedangkan pertumbuhan revenue hanya ${fmtPct(revGrowth)} YoY (selisih laju ${fmtPct(rpGrowth - revGrowth)}).`,
+        impact: "Risiko likuiditas terserap ke entitas terafiliasi, potensi uncollectible related-party debt, atau transaksi transfer harga non-arms-length.",
+        rationale: "Perlu konfirmasi saldo intercompany, jadwal pelunasan kas, dan penyesuaian eliminasi transaksi timbal-balik pada kertas kerja konsolidasi."
+      });
+    }
+
+    // 3. Entity-level DER surge
+    if(e.eqCY && e.eqPY){
+      const derCY = e.liabCY / e.eqCY;
+      const derPY = e.liabPY / e.eqPY;
+      const derChange = pct(derCY, derPY);
+      if(derChange !== null && derChange > 0.18){
+        flags.push({
+          id: "der-" + e.name.replace(/\s+/g,'-'),
+          entity: e.name,
+          category: "Solvabilitas & Leverage",
+          severity: derChange > 0.35 ? "high" : "med",
+          title: `Kenaikan Leverage / DER Signifikan — ${e.name}`,
+          detail: `Rasio Utang terhadap Ekuitas (DER) naik dari ${derPY.toFixed(2)}x ke ${derCY.toFixed(2)}x (kenaikan ${fmtPct(derChange)}), didorong peningkatan liabilitas dari ${fmtNum(e.liabPY)} M ke ${fmtNum(e.liabCY)} M.`,
+          impact: "Peningkatan beban bunga konsolidasi dan risiko default atau pembatasan debt covenant dari kreditur perbankan.",
+          rationale: "Lakukan verifikasi peruntukan penarikan utang baru (apakah untuk belanja modal produktif atau pembiayaan operasional entitas lain)."
+        });
+      }
+    }
+
+    // 4. Margin expansion / compression
+    if(e.revCY && e.revPY && e.niCY && e.niPY){
+      const marginCY = e.niCY / e.revCY;
+      const marginPY = e.niPY / e.revPY;
+      const marginDelta = marginCY - marginPY;
+      if(Math.abs(marginDelta) >= 0.035){
+        flags.push({
+          id: "margin-" + e.name.replace(/\s+/g,'-'),
+          entity: e.name,
+          category: "Profitabilitas & Efisiensi",
+          severity: Math.abs(marginDelta) > 0.07 ? "med" : "low",
+          title: `Pergeseran Net Profit Margin (≥3.5pp) — ${e.name}`,
+          detail: `Net profit margin berubah dari ${(marginPY*100).toFixed(1)}% menjadi ${(marginCY*100).toFixed(1)}% (${marginDelta > 0 ? "+" : ""}${(marginDelta*100).toFixed(1)} percentage points).`,
+          impact: marginDelta > 0 ? "Perlu uji validasi apakah kenaikan margin berasal dari operasional murni atau keuntungan satu kali (one-off gain)." : "Terjadi inefisiensi beban pokok/operasional yang menekan daya laba anak perusahaan.",
+          rationale: "Telusuri rincian pos laba/rugi lain-lain dan beban non-operasional entitas."
+        });
+      }
+    }
+
+    // 5. Revenue up but Net Income down (divergence)
+    if(revGrowth !== null && revGrowth > 0.02 && (e.niCY - e.niPY) < 0){
+      flags.push({
+        id: "divergence-" + e.name.replace(/\s+/g,'-'),
+        entity: e.name,
+        category: "Kualitas Laba (Divergensi)",
+        severity: "med",
+        title: `Divergensi: Revenue Naik, Laba Bersih Turun — ${e.name}`,
+        detail: `Pendapatan naik ${fmtPct(revGrowth)}, namun laba bersih justru terpangkas dari ${fmtNum(e.niPY)} M menjadi ${fmtNum(e.niCY)} M.`,
+        impact: "Erosi margin kotor atau pembengkakan beban umum & administrasi yang tidak terkendali.",
+        rationale: "Audit pengeluaran diskresioner dan beban operasional pada entitas tersebut."
+      });
+    }
+  });
+
+  return flags;
+}
+
+/* ================= RENDERING WORKSPACE ================= */
+function renderInputTable(){
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+  entities.forEach((e,i)=>{
+    const tr = document.createElement("tr");
+    let cells = `<td class="name">${e.name}</td>`;
+    fields.forEach(f=>{
+      const val = e[f] === null || e[f] === undefined ? "" : e[f];
+      cells += `<td><input type="number" step="0.1" data-i="${i}" data-f="${f}" value="${val}" onchange="onTableCellChange(this)"></td>`;
+    });
+    tr.innerHTML = cells;
+    tbody.appendChild(tr);
+  });
+}
+
+function onTableCellChange(input){
+  const i = +input.dataset.i;
+  const f = input.dataset.f;
+  const v = input.value === "" ? null : parseFloat(input.value);
+  entities[i][f] = v;
+  recalculateAll(false);
+}
+
+function renderKPIs(m){
+  document.getElementById("kpiRev").textContent = fmtNum(m.consRevCY) + " M";
+  document.getElementById("kpiRevPY").textContent = fmtNum(m.consRevPY) + " M";
+  const tagRev = document.getElementById("tagRevGrowth");
+  tagRev.textContent = fmtPct(m.revGrowth);
+  tagRev.className = "kpi-tag " + (m.revGrowth >= 0 ? "positive" : "negative");
+
+  document.getElementById("kpiNI").textContent = fmtNum(m.consNiCY) + " M";
+  document.getElementById("kpiNIPY").textContent = fmtNum(m.consNiPY) + " M";
+  const tagNI = document.getElementById("tagNIGrowth");
+  tagNI.textContent = fmtPct(m.niGrowth);
+  tagNI.className = "kpi-tag " + (m.niGrowth >= 0 ? "positive" : "negative");
+
+  document.getElementById("kpiNCI").textContent = fmtNum(m.nciProfitShare) + " M";
+  document.getElementById("kpiParentNI").textContent = fmtNum(m.parentNI) + " M";
+
+  document.getElementById("kpiAssets").textContent = fmtNum(m.consAssetsCY) + " M";
+  document.getElementById("kpiROA").textContent = fmtPct(m.roaCY);
+
+  document.getElementById("kpiDER").textContent = m.derCY.toFixed(2) + "x";
+  document.getElementById("kpiDERPY").textContent = m.derPY.toFixed(2) + "x";
+  const tagDER = document.getElementById("tagDERStatus");
+  tagDER.textContent = m.derCY <= 1.5 ? "Aman" : (m.derCY <= 3.0 ? "Moderat" : "Tinggi");
+  tagDER.className = "kpi-tag " + (m.derCY <= 1.5 ? "positive" : "neutral");
+
+  document.getElementById("kpiROE").textContent = fmtPct(m.roeParent);
+  document.getElementById("kpiParentEq").textContent = fmtNum(m.parentEquity) + " M";
+
+  // Contribution Strip
+  const strip = document.getElementById("contrStrip");
+  const legend = document.getElementById("contrLegend");
+  strip.innerHTML = "";
+  legend.innerHTML = "";
+
+  m.contribution.forEach(c => {
+    const widthPct = Math.max(0, c.share * 100);
+    const seg = document.createElement("div");
+    seg.className = "strip-seg";
+    seg.style.width = widthPct + "%";
+    seg.style.backgroundColor = c.color;
+    seg.title = `${c.name}: ${fmtPct(c.share)} (${fmtNum(c.niCY)} M)`;
+    strip.appendChild(seg);
+
+    const legItem = document.createElement("div");
+    legItem.className = "strip-legend-item";
+    legItem.innerHTML = `<span class="legend-dot" style="background:${c.color}"></span> ${c.name.split(" ")[0]==="Yayasan"?"Yayasan":c.name}: <strong>${fmtPct(c.share)}</strong>`;
+    legend.appendChild(legItem);
+  });
+
+  // Benchmark fields
+  document.getElementById("benchROAEntity").textContent = fmtPct(m.roaCY);
+  document.getElementById("benchDEREntity").textContent = m.derCY.toFixed(2) + "x";
+  document.getElementById("benchNIGrowth").textContent = fmtPct(m.niGrowth);
+  document.getElementById("benchRPTotal").textContent = fmtNum(m.consRpCY) + " M";
+  const rpPct = m.consAssetsCY ? (m.consRpCY / m.consAssetsCY) : 0;
+  document.getElementById("benchRPPct").textContent = fmtPct(rpPct);
+}
+
+/* ================= REVIEW ITEMS SECTION ================= */
+function renderReviewCards(flags){
+  currentFlags = flags;
+  const container = document.getElementById("reviewCardsContainer");
+
+  // Update counts
+  const total = flags.length;
+  let highCnt = 0;
+  let pendingCnt = 0;
+  let clarifyCnt = 0;
+  let findingCnt = 0;
+  let approvedCnt = 0;
+
+  flags.forEach(f => {
+    if(f.severity === 'high') highCnt++;
+    const dec = reviewDecisions[f.id] || { status: 'pending', note: '' };
+    if(dec.status === 'pending') pendingCnt++;
+    else if(dec.status === 'clarify') clarifyCnt++;
+    else if(dec.status === 'finding') findingCnt++;
+    else if(dec.status === 'approved') approvedCnt++;
+  });
+
+  document.getElementById("cntAll").textContent = total;
+  document.getElementById("cntHigh").textContent = highCnt;
+  document.getElementById("cntPending").textContent = pendingCnt + clarifyCnt;
+
+  document.getElementById("pillPending").innerHTML = `⏳ ${pendingCnt} Belum Di-review`;
+  document.getElementById("pillClarify").innerHTML = `❓ ${clarifyCnt} Butuh Klarifikasi`;
+  document.getElementById("pillFinding").innerHTML = `🚨 ${findingCnt} Temuan Audit`;
+  document.getElementById("pillApproved").innerHTML = `✅ ${approvedCnt} Disetujui`;
+
+  document.getElementById("reviewStatusSubtitle").textContent = 
+    `Terdeteksi ${total} indikator anomali (${highCnt} Kritis). ${approvedCnt + findingCnt} telah diputuskan oleh auditor.`;
+  document.getElementById("signoffSummaryDetail").textContent = 
+    `${approvedCnt + findingCnt + clarifyCnt} dari ${total} temuan telah ditindaklanjuti.`;
+
+  if(flags.length === 0){
+    container.innerHTML = `
+      <div style="padding: 26px; text-align: center; color: var(--ok); background: var(--ok-bg); border-radius: 6px;">
+        <strong>Tidak ditemukan anomali material!</strong> Semua alokasi NCI, DER, pertumbuhan piutang relasi, dan margin konsolidasi berada dalam koridor wajar.
+      </div>`;
+    return;
+  }
+
+  // Filter flags
+  let visibleFlags = flags;
+  if(activeFilter === 'high') visibleFlags = flags.filter(f => f.severity === 'high');
+  else if(activeFilter === 'pending') visibleFlags = flags.filter(f => {
+    const st = (reviewDecisions[f.id] || {}).status || 'pending';
+    return st === 'pending' || st === 'clarify';
+  });
+
+  if(visibleFlags.length === 0){
+    container.innerHTML = `<div style="padding: 18px; text-align: center; color: var(--ink-soft); font-style: italic;">Tidak ada temuan pada filter ini.</div>`;
+    return;
+  }
+
+  container.innerHTML = visibleFlags.map((f, idx) => {
+    const decision = reviewDecisions[f.id] || { status: 'pending', note: '' };
+    const sevClass = f.severity === 'high' ? 'is-high' : (f.severity === 'med' ? 'is-med' : 'is-low');
+    const sevLabel = f.severity === 'high' ? 'Tinggi / Kritis' : (f.severity === 'med' ? 'Sedang' : 'Rendah');
+
+    return `
+      <div class="review-item-card ${sevClass}" id="card-${f.id}">
+        <div class="review-item-top">
+          <div>
+            <div class="review-item-title">
+              <span>#${idx+1}. ${f.title}</span>
+              <span class="sev-tag ${f.severity}">${sevLabel}</span>
+              <span style="font-size:11px; color:var(--ink-muted); font-weight:normal;">• ${f.category}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-item-body">
+          <div class="review-detail-text">
+            <strong>Kondisi Ditemukan:</strong> ${f.detail}
+          </div>
+          <div class="review-detail-text" style="color:var(--danger); font-size:12px;">
+            <strong>Dampak & Risiko:</strong> ${f.impact}
+          </div>
+          <div class="review-rationale">
+            <strong>Rekomendasi AI Forensic Agent:</strong> ${f.rationale}
+          </div>
+
+          <!-- Action & Reviewer Response Row -->
+          <div class="review-action-row">
+            <div>
+              <label style="display:block; font-size:10.5px; color:var(--ink-muted); margin-bottom:3px; font-weight:600;">KEPUTUSAN REVIEWER:</label>
+              <select class="status-select" onchange="updateReviewStatus('${f.id}', this.value)">
+                <option value="pending" ${decision.status==='pending'?'selected':''}>⏳ Belum Di-review</option>
+                <option value="clarify" ${decision.status==='clarify'?'selected':''}>❓ Perlu Klarifikasi Manajemen</option>
+                <option value="finding" ${decision.status==='finding'?'selected':''}>🚨 Jadikan Temuan Audit (Revisi)</option>
+                <option value="approved" ${decision.status==='approved'?'selected':''}>✅ Disetujui / Justified</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:10.5px; color:var(--ink-muted); margin-bottom:3px; font-weight:600;">CATATAN AUDITOR / REVIEWER:</label>
+              <input type="text" class="reviewer-note-input" id="note-${f.id}" 
+                     placeholder="Tulis catatan atau dokumen pendukung yang diminta..." 
+                     value="${escapeHtml(decision.note || '')}" 
+                     onchange="updateReviewNote('${f.id}', this.value)">
+            </div>
+
+            <div>
+              <label style="display:block; font-size:10.5px; opacity:0; margin-bottom:3px;">_</label>
+              <button class="btn-save-review" onclick="quickClarify('${f.id}', '${f.entity}')">
+                Kirim Notif Entitas
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function escapeHtml(str){
+  return String(str).replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+function filterReviewItems(mode){
+  activeFilter = mode;
+  document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
+  event.target.classList.add("active");
+  renderReviewCards(currentFlags);
+}
+
+function updateReviewStatus(id, newStatus){
+  if(!reviewDecisions[id]) reviewDecisions[id] = { status: 'pending', note: '' };
+  reviewDecisions[id].status = newStatus;
+  renderReviewCards(currentFlags);
+
+  // Sync to chat agent
+  const flag = currentFlags.find(f => f.id === id);
+  if(flag){
+    const statusLabels = {
+      pending: "Belum Di-review",
+      clarify: "Perlu Klarifikasi Manajemen",
+      finding: "Dijadikan Temuan Audit / Perlu Penyesuaian",
+      approved: "Disetujui / Justified"
+    };
+    appendAgentSystemNote(`Status review untuk <strong>${flag.title}</strong> diperbarui menjadi: <em>${statusLabels[newStatus]}</em>.`);
+  }
+}
+
+function updateReviewNote(id, newNote){
+  if(!reviewDecisions[id]) reviewDecisions[id] = { status: 'pending', note: '' };
+  reviewDecisions[id].note = newNote;
+}
+
+function quickClarify(id, entityName){
+  const flag = currentFlags.find(f => f.id === id);
+  if(!flag) return;
+  updateReviewStatus(id, 'clarify');
+  const noteInput = document.getElementById("note-" + id);
+  if(noteInput && !noteInput.value){
+    noteInput.value = `Permintaan data klarifikasi dikirim ke Direksi/CFO ${entityName}`;
+    updateReviewNote(id, noteInput.value);
+  }
+  appendAgentSystemNote(`📧 <strong>Surat Klarifikasi Dibuat:</strong> Permintaan konfirmasi atas <em>${flag.title}</em> telah dialamatkan kepada tim akuntansi <strong>${entityName}</strong>.`);
+  alert(`Permintaan klarifikasi atas temuan "${flag.title}" telah dicatat. Entitas anak akan dimintai kertas kerja rekonsiliasi.`);
+}
+
+function toggleSignoff(){
+  isSignedOff = !isSignedOff;
+  const statusEl = document.getElementById("signoffStatusText");
+  const btnText = document.getElementById("signoffBtnText");
+  const icon = document.getElementById("signoffIcon");
+  const btn = document.getElementById("btnFinalSignoff");
+
+  if(isSignedOff){
+    statusEl.innerHTML = `<span style="color:var(--ok); font-weight:700;">✅ REVIEW SELESAI & TELAH DITANDATANGANI</span>`;
+    btnText.textContent = "Batal Sign-off (Buka Kembali)";
+    icon.textContent = "↩️";
+    btn.style.background = "var(--ink-soft)";
+    appendAgentSystemNote(`📜 <strong>Sign-Off Selesai:</strong> Lembar kerja telaah konsolidasi telah ditandatangani oleh Internal Audit pada ${new Date().toLocaleDateString('id-ID')}.`);
+  } else {
+    statusEl.textContent = "Dalam Proses Review";
+    btnText.textContent = "Tandai Review Selesai & Sign-off";
+    icon.textContent = "✍️";
+    btn.style.background = "var(--forest)";
+  }
+}
+
+function printReviewReport(){
+  window.print();
+}
+
+/* ================= CHAT COMPONENT ENGINE ================= */
+function appendMessage(sender, htmlContent){
+  const history = document.getElementById("chatHistory");
+  const msgDiv = document.createElement("div");
+  msgDiv.className = `chat-msg ${sender}`;
+
+  const avatarText = sender === 'agent' ? 'AI' : 'Anda';
+  msgDiv.innerHTML = `
+    <div class="msg-avatar">${avatarText}</div>
+    <div class="msg-bubble">${htmlContent}</div>
+  `;
+  history.appendChild(msgDiv);
+  history.scrollTop = history.scrollHeight;
+}
+
+function appendAgentSystemNote(text){
+  const history = document.getElementById("chatHistory");
+  const noteDiv = document.createElement("div");
+  noteDiv.style.margin = "4px 0";
+  noteDiv.style.fontSize = "11.8px";
+  noteDiv.style.color = "var(--ink-soft)";
+  noteDiv.style.background = "#F1EEE5";
+  noteDiv.style.padding = "6px 10px";
+  noteDiv.style.borderRadius = "5px";
+  noteDiv.style.borderLeft = "3px solid var(--forest)";
+  noteDiv.innerHTML = text;
+  history.appendChild(noteDiv);
+  history.scrollTop = history.scrollHeight;
+}
+
+function sendQuickPrompt(promptText){
+  document.getElementById("chatInput").value = promptText;
+  handleChatSubmit(new Event('submit'));
+}
+
+function handleChatSubmit(e){
+  e.preventDefault();
+  const input = document.getElementById("chatInput");
+  const userText = input.value.trim();
+  if(!userText) return;
+
+  // Render user message
+  appendMessage('user', escapeHtml(userText));
+  input.value = "";
+  document.getElementById("chatSendBtn").disabled = true;
+
+  // Process through Agent
+  processAgentQuery(userText);
+}
+
+function processAgentQuery(query){
+  const lower = query.toLowerCase();
+
+  // Show thinking step indicator
+  const history = document.getElementById("chatHistory");
+  const thinkingDiv = document.createElement("div");
+  thinkingDiv.className = "chat-msg agent";
+  thinkingDiv.id = "agentThinkingMsg";
+  thinkingDiv.innerHTML = `
+    <div class="msg-avatar">AI</div>
+    <div class="msg-bubble">
+      <div class="reasoning-box">
+        <div class="reasoning-step active" id="st1">⏳ Menganalisis parameter pertanyaan & data konsolidasi...</div>
+        <div class="reasoning-step" id="st2">⏳ Mengevaluasi kertas kerja 6 entitas & eliminasi...</div>
+        <div class="reasoning-step" id="st3">⏳ Menyiapkan rekomendasi review & data dashboard...</div>
+      </div>
+    </div>
+  `;
+  history.appendChild(thinkingDiv);
+  history.scrollTop = history.scrollHeight;
+
+  setTimeout(()=>{
+    const st1 = document.getElementById("st1");
+    if(st1){ st1.className = "reasoning-step done"; st1.textContent = "✓ Parameter & data konsolidasi tervalidasi"; }
+  }, 400);
+
+  setTimeout(()=>{
+    const st2 = document.getElementById("st2");
+    if(st2){ st2.className = "reasoning-step done"; st2.textContent = "✓ Anomali alokasi NCI & piutang afiliasi dihitung"; }
+  }, 900);
+
+  setTimeout(()=>{
+    // Remove thinking message
+    const t = document.getElementById("agentThinkingMsg");
+    if(t) t.remove();
+    document.getElementById("chatSendBtn").disabled = false;
+
+    // Generate intelligent response based on current metrics and flags
+    generateAgentResponse(lower, query);
+  }, 1400);
+}
+
+function generateAgentResponse(lower, originalQuery){
+  const m = currentMetrics;
+  const flags = currentFlags;
+  const highFlags = flags.filter(f => f.severity === 'high');
+
+  let responseHtml = "";
+
+  // Intent 1: General Analysis / "Jalankan analisis & tampilkan dashboard"
+  if(lower.includes("analis") || lower.includes("dashboard") || lower.includes("jalankan") || lower.includes("tampilkan") || lower.includes("semua") || lower.includes("review")){
+    responseHtml = `
+      Saya telah menyelesaikan evaluasi konsolidasi menyeluruh untuk <strong>Yayasan dan 5 Anak Perusahaan</strong>.
+      <br><br>
+      <strong>Ringkasan Eksekutif Finansial:</strong>
+      <div class="chat-card">
+        <div class="chat-card-title">
+          <span>Kinerja Konsolidasi</span>
+          <span>CY vs PY</span>
+        </div>
+        <div class="chat-card-grid">
+          <div class="chat-card-stat">
+            <div class="lbl">Revenue Konsolidasi</div>
+            <div class="val">${fmtNum(m.consRevCY)} M (${fmtPct(m.revGrowth)})</div>
+          </div>
+          <div class="chat-card-stat">
+            <div class="lbl">Laba Bersih Konsolidasi</div>
+            <div class="val">${fmtNum(m.consNiCY)} M (${fmtPct(m.niGrowth)})</div>
+          </div>
+          <div class="chat-card-stat">
+            <div class="lbl">Hak Laba NCI</div>
+            <div class="val">${fmtNum(m.nciProfitShare)} M</div>
+          </div>
+          <div class="chat-card-stat">
+            <div class="lbl">Rasio DER / Leverage</div>
+            <div class="val">${m.derCY.toFixed(2)}x (Aman)</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <strong>⚠️ Temuan yang Perlu Di-Review (${flags.length} Temuan, ${highFlags.length} Kritis):</strong>
+        <ul style="margin: 6px 0 6px 18px; font-size:12.3px; line-height:1.5;">
+          ${flags.map(f => `<li><strong>[${f.severity.toUpperCase()}] ${f.entity}:</strong> ${f.title}</li>`).join("")}
+        </ul>
+      </div>
+
+      Seluruh rincian temuan, kertas kerja alokasi, dan panel pengambilan keputusan audit telah diperbarui pada <strong>Review Dashboard</strong>.
+      <br>
+      <button class="chat-cta-btn" onclick="scrollToReviewDashboard()">
+        👉 Lihat & Tindaklanjuti di Review Dashboard
+      </button>
+    `;
+
+    // Ensure we trigger dashboard refresh and show review panel
+    highlightReviewDashboard();
+  }
+
+  // Intent 2: NCI specific inquiry
+  else if(lower.includes("nci") || lower.includes("minoritas") || lower.includes("alokasi")){
+    const nciAnak2 = entities.find(e => e.name.includes("Anak II"));
+    const comp2 = nciAnak2 ? (nciAnak2.niCY * (nciAnak2.nci / 100)) : 0;
+    responseHtml = `
+      <strong>Temuan Alokasi Laba NCI:</strong>
+      <br><br>
+      Pada <strong>PT Anak II</strong> (Kepemilikan NCI ${nciAnak2 ? nciAnak2.nci : 35}%), laba bersih CY tercatat sebesar <strong>${fmtNum(nciAnak2.niCY)} M</strong>.
+      <ul style="margin: 6px 0 6px 18px; font-size:12.3px;">
+        <li>Porsi NCI seharusnya (35% x ${fmtNum(nciAnak2.niCY)} M) = <strong>${fmtNum(comp2)} M</strong>.</li>
+        <li>Namun pada laporan dilaporkan dialokasikan sebesar: <strong>${fmtNum(nciAnak2.reportedNci)} M</strong>.</li>
+        <li>Terdapat selisih over-alokasi sebesar <strong>${fmtNum(nciAnak2.reportedNci - comp2)} M (+${fmtPct(pct(nciAnak2.reportedNci, comp2))})</strong>.</li>
+      </ul>
+      <strong>Dampak Audit:</strong> Hal ini menyebabkan laba yang dapat diatribusikan ke entitas induk berkurang tidak semestinya. Rekomendasi: minta konfirmasi penyesuaian jurnal dividen atau perjanjian pemegang saham khusus.
+      <br>
+      <button class="chat-cta-btn" onclick="focusReviewItem('nci-PT-Anak-II')">
+        🔍 Review Temuan PT Anak II di Dashboard
+      </button>
+    `;
+  }
+
+  // Intent 3: Related-Party / Afiliasi inquiry
+  else if(lower.includes("afiliasi") || lower.includes("related") || lower.includes("piutang") || lower.includes("relasi")){
+    const rpFlags = flags.filter(f => f.category.includes("Afiliasi"));
+    responseHtml = `
+      <strong>Analisis Transaksi Pihak Berelasi (Related-Party):</strong>
+      <br><br>
+      Total piutang pihak berelasi konsolidasi tahun ini mencapai <strong>${fmtNum(m.consRpCY)} M</strong> (tumbuh dari ${fmtNum(m.consRpPY)} M di tahun lalu).
+      <br><br>
+      Konsentrasi risiko tertinggi berada pada <strong>PT Anak II</strong>:
+      <ul style="margin: 6px 0 6px 18px; font-size:12.3px;">
+        <li>Piutang berelasi melonjak <strong>+158.8%</strong> (dari 34 M ke 88 M).</li>
+        <li>Sementara omzet revenue hanya tumbuh <strong>+4.9%</strong>.</li>
+      </ul>
+      Kondisi ini mengindikasikan adanya aliran dana keluar ke perusahaan afiliasi lain yang berpotensi mengurangi likuiditas operasional.
+      <br>
+      <button class="chat-cta-btn" onclick="focusReviewItem('rp-PT-Anak-II')">
+        🔍 Buka Lembar Review Piutang Afiliasi
+      </button>
+    `;
+  }
+
+  // Intent 4: Industry / OJK Benchmark
+  else if(lower.includes("ojk") || lower.includes("benchmark") || lower.includes("industri") || lower.includes("sektor")){
+    responseHtml = `
+      <strong>Komparasi Benchmark Sektoral (OJK & Multifinance):</strong>
+      <br><br>
+      1. <strong>Solvabilitas (DER ${m.derCY.toFixed(2)}x):</strong> Sangat sehat. Batas maksimal POJK untuk lembaga pembiayaan adalah 5.0x. Portofolio konsolidasi berada jauh di bawah ambang risiko krisis.
+      <br>
+      2. <strong>Rentabilitas (ROA ${fmtPct(m.roaCY)}):</strong> Sejalan dengan kuartil atas industri multifinance nasional (rata-rata 3.5% - 5.2%).
+      <br>
+      3. <strong>Pertumbuhan Laba (${fmtPct(m.niGrowth)}):</strong> Berada di atas pertumbuhan industri (+8.0%).
+      <br><br>
+      Secara agregat fundamental sangat kuat, namun pengawasan harus difokuskan pada integritas pelaporan anak usaha NCI.
+    `;
+  }
+
+  // Intent 5: Simulation (e.g. if PT Anak II NI drops)
+  else if(lower.includes("simulasi") || lower.includes("turun") || lower.includes("naik")){
+    responseHtml = `
+      <strong>Simulasi Sensitivitas Finansial:</strong>
+      <br><br>
+      Jika laba PT Anak II diturunkan atau disesuaikan, dampak langsung terhadap laporan konsolidasi:
+      <ul style="margin: 6px 0 6px 18px; font-size:12.3px;">
+        <li>Setiap penurunan 10 M laba PT Anak II akan mengurangi laba konsolidasi sebesar 10 M.</li>
+        <li>Beban hak NCI berkurang otomatis sebesar 3.5 M (35%).</li>
+        <li>Dampak neto terhadap laba Induk adalah penurunan 6.5 M.</li>
+      </ul>
+      Anda dapat menguji angka ini secara langsung dengan mengedit kolom <em>Laba Bersih CY</em> pada tabel di bawah.
+    `;
+  }
+
+  // Fallback
+  else {
+    responseHtml = `
+      Saya memahami instruksi Anda terkait <em>"${escapeHtml(originalQuery)}"</em>.
+      <br><br>
+      Berdasarkan data konsolidasi 6 entitas saat ini:
+      <ul style="margin: 6px 0 6px 18px; font-size:12.3px;">
+        <li>Total Revenue Konsolidasi: <strong>${fmtNum(m.consRevCY)} M</strong></li>
+        <li>Laba Bersih Atributable ke Induk: <strong>${fmtNum(m.parentNI)} M</strong></li>
+        <li>Jumlah Temuan Memerlukan Keputusan: <strong>${flags.length} Isu</strong></li>
+      </ul>
+      Apakah Anda ingin saya membuatkan draft memo tanggapan auditor atau menelaah entitas tertentu secara mendalam?
+      <br>
+      <button class="chat-cta-btn" onclick="scrollToReviewDashboard()">
+        📊 Tinjau Dashboard Sekarang
+      </button>
+    `;
+  }
+
+  appendMessage('agent', responseHtml);
+}
+
+function scrollToReviewDashboard(){
+  // Switch to split or dashboard mode if currently in chat only
+  const grid = document.getElementById("workspaceGrid");
+  if(grid.classList.contains("mode-chat")){
+    switchMode("split");
+  }
+  const el = document.getElementById("reviewItemsPanel");
+  if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function focusReviewItem(cardId){
+  scrollToReviewDashboard();
+  setTimeout(()=>{
+    const card = document.getElementById("card-" + cardId);
+    if(card){
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.style.outline = "2.5px solid var(--forest)";
+      card.style.boxShadow = "0 0 14px rgba(27, 67, 50, 0.25)";
+      setTimeout(()=>{
+        card.style.outline = "";
+        card.style.boxShadow = "";
+      }, 2500);
+    }
+  }, 350);
+}
+
+function highlightReviewDashboard(){
+  const banner = document.querySelector(".review-status-banner");
+  if(banner){
+    banner.style.boxShadow = "0 0 10px rgba(184, 144, 46, 0.4)";
+    setTimeout(()=>{ banner.style.boxShadow = ""; }, 2000);
+  }
+}
+
+function resetChat(){
+  document.getElementById("chatHistory").innerHTML = `
+    <div class="chat-msg agent">
+      <div class="msg-avatar">AI</div>
+      <div class="msg-bubble">
+        Percakapan telah di-reset. Semua metrik konsolidasi dan data 6 entitas siap ditelaah kembali. Silakan ajukan pertanyaan atau pilih instruksi cepat di bawah.
+      </div>
+    </div>
+  `;
+}
+
+/* ================= VIEW MODE SWITCHER ================= */
+function switchMode(mode){
+  const grid = document.getElementById("workspaceGrid");
+  const chatPane = document.getElementById("chatPane");
+  const dashPane = document.getElementById("dashboardPane");
+  const inputPanel = document.getElementById("inputTablePanel");
+
+  grid.className = `workspace-grid mode-${mode}`;
+
+  document.querySelectorAll(".view-btn").forEach(b => b.classList.remove("active"));
+  if(mode === 'split') document.getElementById("btnModeSplit").classList.add("active");
+  if(mode === 'chat') document.getElementById("btnModeChat").classList.add("active");
+  if(mode === 'dashboard') document.getElementById("btnModeDashboard").classList.add("active");
+  if(mode === 'data') document.getElementById("btnModeData").classList.add("active");
+
+  if(mode === 'chat'){
+    chatPane.style.display = "flex";
+    dashPane.style.display = "none";
+  } else if(mode === 'dashboard'){
+    chatPane.style.display = "none";
+    dashPane.style.display = "flex";
+    inputPanel.scrollIntoView = false;
+  } else if(mode === 'data'){
+    chatPane.style.display = "none";
+    dashPane.style.display = "flex";
+    setTimeout(()=>{
+      inputPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  } else { // split
+    chatPane.style.display = "flex";
+    dashPane.style.display = "flex";
+  }
+}
+
+/* ================= INITIALIZATION & ORCHESTRATION ================= */
+function recalculateAll(notifyChat = false){
+  currentMetrics = computeMetrics(entities);
+  renderKPIs(currentMetrics);
+  currentFlags = runAnomalyRules(entities, currentMetrics);
+  renderReviewCards(currentFlags);
+
+  if(notifyChat){
+    appendAgentSystemNote(`🔄 <strong>Data Diperbarui:</strong> Metrik konsolidasi dihitung ulang (${fmtNum(currentMetrics.consRevCY)} M Revenue, ${fmtNum(currentMetrics.consNiCY)} M Laba Bersih, ${currentFlags.length} Anomali terdeteksi).`);
+  }
+}
+
+function resetToDefaultData(){
+  entities = JSON.parse(JSON.stringify(DEFAULT_ENTITIES));
+  renderInputTable();
+  recalculateAll(true);
+}
+
+// Initial Bootstrap
+function init(){
+  const today = new Date();
+  document.getElementById("signoffDate").textContent = today.toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+  renderInputTable();
+  recalculateAll(false);
+}
+
+init();
+</script>
+</body>
+</html>
