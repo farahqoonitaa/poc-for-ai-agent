@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Generate an executive presentation deck (.pptx) in English with a clean White/Light theme.
-Project: Financial Consolidation Analyzer & Review Workspace (AI Forensic Copilot)
+Includes both Solution Architecture AND Live Presentation Output (Dashboard & Review Results).
 """
 
 from pptx import Presentation
@@ -31,7 +31,6 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
     COLOR_DANGER      = RGBColor(225, 29, 72)   # Rose-600 #E11D48
     COLOR_WARN        = RGBColor(217, 119, 6)   # Amber-600 #D97706
     COLOR_OK          = RGBColor(13, 148, 136)  # Teal-600 #0D9488
-    COLOR_WHITE       = RGBColor(255, 255, 255)
 
     def set_white_bg(slide):
         bg = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, Inches(13.333), Inches(7.5))
@@ -40,7 +39,7 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
         bg.line.fill.background()
         return bg
 
-    def add_header(slide, title_text, category_text="FINANCIAL CONSOLIDATION ANALYZER &bull; SOLUTION ARCHITECTURE"):
+    def add_header(slide, title_text, category_text="FINANCIAL CONSOLIDATION ANALYZER &bull; PRESENTATION OUTPUT"):
         # Top Accent Line
         top_bar = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.8), Inches(0.4), Inches(11.733), Inches(0.04))
         top_bar.fill.solid()
@@ -74,7 +73,6 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
         card.line.color.rgb = COLOR_CARD_BORDER
         card.line.width = Pt(1.0)
 
-        # Optional top colored accent strip
         if top_border_color:
             strip = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, width, Inches(0.08))
             strip.fill.solid()
@@ -103,12 +101,11 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
     top_y = Inches(1.75)
 
     # -------------------------------------------------------------
-    # SLIDE 1: TITLE SLIDE (Clean Minimalist Executive White)
+    # SLIDE 1: TITLE SLIDE (Clean White Minimalist Executive)
     # -------------------------------------------------------------
     s1 = prs.slides.add_slide(blank_slide_layout)
     set_white_bg(s1)
 
-    # Left decorative vertical accent
     v_bar = s1.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(1.2), Inches(1.8), Inches(0.08), Inches(3.8))
     v_bar.fill.solid()
     v_bar.fill.fore_color.rgb = COLOR_FOREST
@@ -119,7 +116,7 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
     tf1.word_wrap = True
 
     p_tag = tf1.paragraphs[0]
-    p_tag.text = "ENTERPRISE SOLUTION ARCHITECTURE & STAKEHOLDER ALIGNMENT"
+    p_tag.text = "ENTERPRISE SOLUTION ARCHITECTURE & PRESENTATION OUTPUT"
     p_tag.font.size = Pt(11)
     p_tag.font.bold = True
     p_tag.font.color.rgb = COLOR_GOLD
@@ -139,12 +136,11 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
     p_sub.space_before = Pt(8)
 
     p_desc = tf1.add_paragraph()
-    p_desc.text = "An automated system for group financial consolidation review, mathematical anomaly detection (IFRS 10 / PSAK 65 NCI & IAS 24 / PSAK 7 Related-Parties), and internal audit sign-off workflows."
+    p_desc.text = "Executive presentation deck showcasing the architectural blueprint, live tool outputs, quantitative anomaly flags, and auditor sign-off workflows for Holding Foundation & 5 Subsidiaries."
     p_desc.font.size = Pt(12)
     p_desc.font.color.rgb = COLOR_TEXT_MUTED
     p_desc.space_before = Pt(14)
 
-    # Bottom Metadata Bar
     bot_card = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.2), Inches(5.6), Inches(10.9), Inches(1.1))
     bot_card.fill.solid()
     bot_card.fill.fore_color.rgb = COLOR_CARD_BG
@@ -154,19 +150,19 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
     tf_meta = tb_meta.text_frame
     tf_meta.word_wrap = True
     p_m1 = tf_meta.paragraphs[0]
-    p_m1.text = "Target Structure: Holding Foundation (Induk) & 5 Operating Subsidiaries (Subsidiaries I – V)"
+    p_m1.text = "Entities: Holding Foundation (Induk) & 5 Operating Subsidiaries (PT Anak I – V)"
     p_m1.font.size = Pt(11.5)
     p_m1.font.bold = True
     p_m1.font.color.rgb = COLOR_PRIMARY
 
     p_m2 = tf_meta.add_paragraph()
-    p_m2.text = "Standards: IFRS 10 / PSAK 65 (NCI Attribution) &bull; IAS 24 / PSAK 7 (Related-Party Transactions) &bull; POJK Prudential Ratios"
+    p_m2.text = "Standards: IFRS 10 / PSAK 65 (NCI Attribution) &bull; IAS 24 / PSAK 7 (Related-Parties) &bull; POJK Prudential Ratios"
     p_m2.font.size = Pt(11)
     p_m2.font.color.rgb = COLOR_TEXT_MUTED
     p_m2.space_before = Pt(3)
 
     # -------------------------------------------------------------
-    # SLIDE 2: THE MULTI-ENTITY CONSOLIDATION CHALLENGE
+    # SLIDE 2: THE CONSOLIDATION CHALLENGE
     # -------------------------------------------------------------
     s2 = prs.slides.add_slide(blank_slide_layout)
     set_white_bg(s2)
@@ -177,16 +173,16 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
 
     add_card(s2, Inches(0.8), top_y, c_w, c_h, "1. NCI Allocation Leakage (IFRS 10)", [
         "Minority interests (NCI 22% - 40%) across 4 operating subsidiaries are prone to manual calculation errors.",
-        "Case in Point: Subsidiary II reported NCI profit share of $24.4M vs. statutory share of $18.2M (+34.1% gap).",
+        "Case in Point: Subsidiary II reported NCI profit share of $24.4M vs statutory share of $18.2M (+34.1% gap).",
         "Material Impact: Distorts parent net income downwards or masks disguised profit extractions.",
         "Traditional spreadsheets lack automated mathematical reconciliation of effective minority stakes."
     ], COLOR_DANGER)
 
     add_card(s2, Inches(4.84), top_y, c_w, c_h, "2. Related-Party Debt Spikes (IAS 24)", [
         "Intercompany receivables frequently surge without commensurate commercial revenue growth.",
-        "Case in Point: Subsidiary II related-party receivables spiked +158.8% YoY while revenues grew just +4.9%.",
+        "Case in Point: Subsidiary II related-party receivables spiked +158.8% YoY while revenue grew just +4.9%.",
         "Severe Risk: Holding liquidity becomes trapped in affiliated entities under non-arms-length terms.",
-        "Increases intercompany elimination friction and triggers uncollectible debt exposure."
+        "Increases intercompany elimination friction and uncollectible debt exposure."
     ], COLOR_WARN)
 
     add_card(s2, Inches(8.88), top_y, c_w, c_h, "3. Fragmented Audit Trails", [
@@ -197,7 +193,7 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
     ], COLOR_BLUE)
 
     # -------------------------------------------------------------
-    # SLIDE 3: THE DUAL-ENGINE SOLUTION VISION
+    # SLIDE 3: DUAL-ENGINE SOLUTION VISION
     # -------------------------------------------------------------
     s3 = prs.slides.add_slide(blank_slide_layout)
     set_white_bg(s3)
@@ -206,7 +202,7 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
     add_card(s3, Inches(0.8), top_y, Inches(5.6), Inches(4.8), "Engine 1: Deterministic Accounting Engine", [
         "100% Mathematical Precision: Rigorous aggregation of Revenues, Net Income, Assets, Liabilities, and Equity.",
         "Automated Intercompany Eliminations: Standardized matrices eliminate cross-holdings and reciprocal debt.",
-        "Statutory NCI Attribution: Precise IFRS 10 formulas calculate parent earnings vs. minority equity claims.",
+        "Statutory NCI Attribution: Precise IFRS 10 formulas calculate parent earnings vs minority equity claims.",
         "Zero Black-Box Calculations: Every number is derived from transparent, reproducible accounting formulas.",
         "Instant Dynamic Recalculation: Input modifications dynamically update solvency and profitability indicators."
     ], COLOR_FOREST)
@@ -241,11 +237,132 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
         add_card(s4, x, top_y, t_w, t_h, title, items, col)
 
     # -------------------------------------------------------------
-    # SLIDE 5: FORENSIC ANOMALY DETECTION ENGINE
+    # SLIDE 5: LIVE TOOL OUTPUT: CONSOLIDATED KPI DASHBOARD (NEW!)
     # -------------------------------------------------------------
     s5 = prs.slides.add_slide(blank_slide_layout)
     set_white_bg(s5)
-    add_header(s5, "Forensic Anomaly Detection Engine: Vectors & Thresholds", "Quantitative Rules")
+    add_header(s5, "Tool Output: Consolidated Financial KPI Dashboard", "Live Financial Metrics")
+
+    kpis = [
+        ("Consolidated Revenue", "$3,885.0 M", "PY: $3,635.0 M (+6.9% YoY)", COLOR_FOREST),
+        ("Consolidated Net Income", "$325.0 M", "PY: $284.7 M (+14.2% YoY)", COLOR_FOREST),
+        ("Parent Attributable Income", "$279.7 M", "86.1% share of net profits", COLOR_GOLD),
+        ("NCI Minority Profit Share", "$45.3 M", "13.9% across 4 subsidiaries", COLOR_WARN),
+        ("Consolidated Total Assets", "$6,000.0 M", "ROA: 5.4% (Industry top-quartile)", COLOR_PRIMARY),
+        ("Consolidated Solvency (DER)", "0.96x", "PY: 0.94x (POJK Max: 5.0x Safe)", COLOR_OK)
+    ]
+
+    kw = Inches(3.64)
+    kh = Inches(1.45)
+    for idx, (lbl, val, sub, col) in enumerate(kpis):
+        row = idx // 3
+        col_idx = idx % 3
+        x = Inches(0.8 + col_idx * 4.03)
+        y = Inches(1.75 + row * 1.6)
+
+        c = s5.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, x, y, kw, kh)
+        c.fill.solid()
+        c.fill.fore_color.rgb = COLOR_CARD_BG
+        c.line.color.rgb = COLOR_CARD_BORDER
+
+        bar = s5.shapes.add_shape(MSO_SHAPE.RECTANGLE, x, y, Inches(0.08), kh)
+        bar.fill.solid()
+        bar.fill.fore_color.rgb = col
+        bar.line.fill.background()
+
+        tb = s5.shapes.add_textbox(x + Inches(0.18), y + Inches(0.1), kw - Inches(0.3), kh - Inches(0.2))
+        tf = tb.text_frame
+        tf.word_wrap = True
+
+        p1 = tf.paragraphs[0]
+        p1.text = lbl.upper()
+        p1.font.size = Pt(10)
+        p1.font.bold = True
+        p1.font.color.rgb = COLOR_TEXT_MUTED
+
+        p2 = tf.add_paragraph()
+        p2.text = val
+        p2.font.size = Pt(18)
+        p2.font.bold = True
+        p2.font.color.rgb = COLOR_PRIMARY
+        p2.space_before = Pt(2)
+
+        p3 = tf.add_paragraph()
+        p3.text = sub
+        p3.font.size = Pt(10)
+        p3.font.color.rgb = col
+        p3.space_before = Pt(2)
+
+    # Bottom Entity Contribution Breakdown Card
+    bot_contr = s5.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(5.1), Inches(11.733), Inches(1.8))
+    bot_contr.fill.solid()
+    bot_contr.fill.fore_color.rgb = COLOR_CARD_BG
+    bot_contr.line.color.rgb = COLOR_CARD_BORDER
+
+    tb_contr = s5.shapes.add_textbox(Inches(1.0), Inches(5.2), Inches(11.3), Inches(1.6))
+    tf_c = tb_contr.text_frame
+    tf_c.word_wrap = True
+
+    p_c1 = tf_c.paragraphs[0]
+    p_c1.text = "NET INCOME CONTRIBUTION BREAKDOWN ACROSS 6 ENTITIES"
+    p_c1.font.size = Pt(11)
+    p_c1.font.bold = True
+    p_c1.font.color.rgb = COLOR_PRIMARY
+
+    p_c2 = tf_c.add_paragraph()
+    p_c2.text = "• Yayasan Holding (Induk): $64.0M (19.7%)    • Subsidiary I (100% Control): $118.0M (36.3%)\n• Subsidiary II (35% NCI): $52.0M (16.0%)     • Subsidiary III (40% NCI): $31.0M (9.5%)\n• Subsidiary IV (22% NCI): $41.0M (12.6%)     • Subsidiary V (30% NCI): $19.0M (5.8%)"
+    p_c2.font.size = Pt(11)
+    p_c2.font.color.rgb = COLOR_TEXT_DARK
+    p_c2.space_before = Pt(6)
+
+    # -------------------------------------------------------------
+    # SLIDE 6: LIVE TOOL OUTPUT: ITEMS REQUIRING REVIEW (NEW!)
+    # -------------------------------------------------------------
+    s6 = prs.slides.add_slide(blank_slide_layout)
+    set_white_bg(s6)
+    add_header(s6, "Tool Output: Items Requiring Review (Findings & Decisions)", "Review Workspace")
+
+    findings = [
+        ("NCI Allocation Mismatch — Subsidiary II", "CRITICAL", "Reported $24.4M vs Computed $18.2M (+34.1% gap)", "Status: Needs Management Clarification", "Understatement of parent attributable earnings; potential disguised dividend allocation.", COLOR_DANGER),
+        ("Related-Party Receivable Surge — Subsidiary II", "CRITICAL", "RP Receivables spiked +158.8% YoY vs Revenue +4.9%", "Status: Audit Finding (Requires Revision)", "Risk of unmonitored capital transfer to affiliates under non-arms-length terms.", COLOR_DANGER),
+        ("Earnings Quality Divergence — Subsidiary III", "MEDIUM", "Revenue grew +3.0% YoY while Net Income fell -6.1%", "Status: Under Auditor Inquiry", "Operating margin compression from unvetted overhead and administrative expense spikes.", COLOR_WARN),
+        ("Net Margin Expansion Shift — Subsidiary IV", "MODERATE", "Profit margin jumped from 7.2% to 10.8% (+3.6 pp)", "Status: Justified / Approved", "Verifying if expansion is operational or driven by non-recurring one-off capital gains.", COLOR_OK)
+    ]
+
+    for idx, (f_title, sev, delta, status, impact, col) in enumerate(findings):
+        y = Inches(1.75 + idx * 1.25)
+        c = s6.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), y, Inches(11.733), Inches(1.1))
+        c.fill.solid()
+        c.fill.fore_color.rgb = COLOR_CARD_BG
+        c.line.color.rgb = COLOR_CARD_BORDER
+
+        bar = s6.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.8), y, Inches(0.08), Inches(1.1))
+        bar.fill.solid()
+        bar.fill.fore_color.rgb = col
+        bar.line.fill.background()
+
+        tb = s6.shapes.add_textbox(Inches(1.05), y + Inches(0.08), Inches(11.3), Inches(0.95))
+        tf = tb.text_frame
+        tf.word_wrap = True
+
+        p1 = tf.paragraphs[0]
+        p1.text = f"#{idx+1}. {f_title}  [{sev}]  •  {status}"
+        p1.font.size = Pt(12.5)
+        p1.font.bold = True
+        p1.font.color.rgb = col
+
+        p2 = tf.add_paragraph()
+        p2.text = f"Quantified Delta: {delta}   |   Audit Impact: {impact}"
+        p2.font.size = Pt(10.5)
+        p2.font.color.rgb = COLOR_TEXT_DARK
+        p2.space_before = Pt(3)
+
+    # -------------------------------------------------------------
+    # SLIDE 7: FORENSIC ANOMALY DETECTION ENGINE
+    # -------------------------------------------------------------
+    s7 = prs.slides.add_slide(blank_slide_layout)
+    set_white_bg(s7)
+    add_header(s7, "Forensic Anomaly Detection Engine: Vectors & Thresholds", "Quantitative Rules")
 
     rules_data = [
         ("1. NCI Profit Allocation Disparity", "CRITICAL", "|Reported NCI - Computed NCI| > 8%", "Prevents parent income distortion and safeguards minority shareholder dividend equity under IFRS 10 / PSAK 65.", COLOR_DANGER),
@@ -257,18 +374,17 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
     card_h = Inches(1.1)
     for idx, (r_name, sev, formula, desc, col) in enumerate(rules_data):
         y = Inches(1.75 + idx * 1.25)
-        c = s5.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), y, Inches(11.733), card_h)
+        c = s7.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), y, Inches(11.733), card_h)
         c.fill.solid()
         c.fill.fore_color.rgb = COLOR_CARD_BG
         c.line.color.rgb = COLOR_CARD_BORDER
 
-        # Left indicator bar
-        bar = s5.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.8), y, Inches(0.08), card_h)
+        bar = s7.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.8), y, Inches(0.08), card_h)
         bar.fill.solid()
         bar.fill.fore_color.rgb = col
         bar.line.fill.background()
 
-        tb = s5.shapes.add_textbox(Inches(1.05), y + Inches(0.12), Inches(11.3), card_h - Inches(0.24))
+        tb = s7.shapes.add_textbox(Inches(1.05), y + Inches(0.12), Inches(11.3), card_h - Inches(0.24))
         tf = tb.text_frame
         tf.word_wrap = True
 
@@ -285,45 +401,11 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
         p2.space_before = Pt(3)
 
     # -------------------------------------------------------------
-    # SLIDE 6: REVIEW WORKSPACE & HITL WORKFLOW
+    # SLIDE 8: REGULATORY & SECTORAL BENCHMARKS
     # -------------------------------------------------------------
-    s6 = prs.slides.add_slide(blank_slide_layout)
-    set_white_bg(s6)
-    add_header(s6, "Actionable Review Workspace: Human-in-the-Loop Workflow", "Audit Operations")
-
-    workflow_cards = [
-        ("Step 1: Automated Flagging", [
-            "Rule Engine scans all 6 entities instantly.",
-            "Anomalies classified by severity: Critical, Medium, Moderate.",
-            "Dynamic badges populate the review dashboard."
-        ], COLOR_DANGER),
-        ("Step 2: AI Reasoning & Impact", [
-            "AI Agent derives analytical root causes and accounting impact.",
-            "Relevant IFRS 10 / IAS 24 standards cited.",
-            "Conversational Copilot delivers instant executive briefs."
-        ], COLOR_GOLD),
-        ("Step 3: Auditor Decisions", [
-            "Auditor selects status: Clarify / Audit Finding / Approved.",
-            "Input field records auditor remarks & requested documentation.",
-            "One-click 'Request Clarification' logs notice to subsidiary."
-        ], COLOR_FOREST),
-        ("Step 4: Formal Sign-off", [
-            "Real-time tracking: X of Y anomalies reviewed.",
-            "Formal sign-off locks workpaper with timestamp.",
-            "One-click clean print to PDF ready for the Audit Committee."
-        ], COLOR_BLUE)
-    ]
-
-    for idx, (title, items, col) in enumerate(workflow_cards):
-        x = Inches(0.8 + idx * 2.96)
-        add_card(s6, x, top_y, Inches(2.8), Inches(4.8), title, items, col)
-
-    # -------------------------------------------------------------
-    # SLIDE 7: REGULATORY & SECTORAL BENCHMARKING
-    # -------------------------------------------------------------
-    s7 = prs.slides.add_slide(blank_slide_layout)
-    set_white_bg(s7)
-    add_header(s7, "Consolidated Financial Health vs. Sectoral Benchmarks", "Prudential Ratios")
+    s8 = prs.slides.add_slide(blank_slide_layout)
+    set_white_bg(s8)
+    add_header(s8, "Consolidated Financial Health vs. Sectoral Benchmarks", "Prudential Ratios")
 
     bench_cards = [
         ("Solvency (DER)", "Consolidated: 0.96x", "Regulatory Ceiling: Max 5.0x", "STATUS: HIGHLY CONSERVATIVE", [
@@ -342,18 +424,17 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
 
     for idx, (title, val_entity, val_ind, status, details, col) in enumerate(bench_cards):
         x = Inches(0.8 + idx * 4.03)
-        c = s7.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, x, top_y, Inches(3.64), Inches(4.8))
+        c = s8.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, x, top_y, Inches(3.64), Inches(4.8))
         c.fill.solid()
         c.fill.fore_color.rgb = COLOR_CARD_BG
         c.line.color.rgb = COLOR_CARD_BORDER
 
-        # Top strip
-        strip = s7.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, x, top_y, Inches(3.64), Inches(0.08))
+        strip = s8.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, x, top_y, Inches(3.64), Inches(0.08))
         strip.fill.solid()
         strip.fill.fore_color.rgb = col
         strip.line.fill.background()
 
-        tb = s7.shapes.add_textbox(x + Inches(0.24), top_y + Inches(0.24), Inches(3.16), Inches(4.3))
+        tb = s8.shapes.add_textbox(x + Inches(0.24), top_y + Inches(0.24), Inches(3.16), Inches(4.3))
         tf = tb.text_frame
         tf.word_wrap = True
 
@@ -386,11 +467,11 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
             p_d.space_after = Pt(4)
 
     # -------------------------------------------------------------
-    # SLIDE 8: STAKEHOLDER EXPECTATION ALIGNMENT MATRIX
+    # SLIDE 9: STAKEHOLDER EXPECTATION ALIGNMENT MATRIX
     # -------------------------------------------------------------
-    s8 = prs.slides.add_slide(blank_slide_layout)
-    set_white_bg(s8)
-    add_header(s8, "Stakeholder Expectation Alignment Matrix", "Value Delivery")
+    s9 = prs.slides.add_slide(blank_slide_layout)
+    set_white_bg(s9)
+    add_header(s9, "Stakeholder Expectation Alignment Matrix", "Value Delivery")
 
     matrix_items = [
         ("Audit Committee / Board of Supervisors", "Prevent material misstatements & NCI leakage prior to external audits.", "Automated IFRS 10 rule engine verifies profit distribution & flags critical anomalies instantly."),
@@ -402,18 +483,17 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
 
     for idx, (stakeholder, expectation, delivery) in enumerate(matrix_items):
         y = Inches(1.7 + idx * 1.0)
-        c = s8.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), y, Inches(11.733), Inches(0.9))
+        c = s9.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), y, Inches(11.733), Inches(0.9))
         c.fill.solid()
         c.fill.fore_color.rgb = COLOR_CARD_BG
         c.line.color.rgb = COLOR_CARD_BORDER
 
-        # Vertical indicator
-        bar = s8.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.8), y, Inches(0.06), Inches(0.9))
+        bar = s9.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.8), y, Inches(0.06), Inches(0.9))
         bar.fill.solid()
         bar.fill.fore_color.rgb = COLOR_FOREST
         bar.line.fill.background()
 
-        tb = s8.shapes.add_textbox(Inches(1.0), y + Inches(0.08), Inches(11.3), Inches(0.75))
+        tb = s9.shapes.add_textbox(Inches(1.0), y + Inches(0.08), Inches(11.3), Inches(0.75))
         tf = tb.text_frame
         tf.word_wrap = True
 
@@ -429,11 +509,11 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
         p2.font.color.rgb = COLOR_TEXT_DARK
 
     # -------------------------------------------------------------
-    # SLIDE 9: PHASED ENTERPRISE IMPLEMENTATION ROADMAP
+    # SLIDE 10: PHASED ENTERPRISE IMPLEMENTATION ROADMAP
     # -------------------------------------------------------------
-    s9 = prs.slides.add_slide(blank_slide_layout)
-    set_white_bg(s9)
-    add_header(s9, "Phased Enterprise Implementation Roadmap", "Deployment Plan")
+    s10 = prs.slides.add_slide(blank_slide_layout)
+    set_white_bg(s10)
+    add_header(s10, "Phased Enterprise Implementation Roadmap", "Deployment Plan")
 
     phases = [
         ("Phase 1: Working PoC (Delivered)", "Month 1", [
@@ -458,14 +538,14 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
 
     for idx, (p_title, p_time, bullets, col) in enumerate(phases):
         x = Inches(0.8 + idx * 4.03)
-        add_card(s9, x, top_y, Inches(3.64), Inches(4.8), f"{p_title}\n({p_time})", bullets, col)
+        add_card(s10, x, top_y, Inches(3.64), Inches(4.8), f"{p_title}\n({p_time})", bullets, col)
 
     # -------------------------------------------------------------
-    # SLIDE 10: EXECUTIVE VALUE PROPOSITION & NEXT STEPS
+    # SLIDE 11: EXECUTIVE VALUE PROPOSITION & NEXT STEPS
     # -------------------------------------------------------------
-    s10 = prs.slides.add_slide(blank_slide_layout)
-    set_white_bg(s10)
-    add_header(s10, "Executive Value Proposition & Recommended Next Steps", "Strategic Impact")
+    s11 = prs.slides.add_slide(blank_slide_layout)
+    set_white_bg(s11)
+    add_header(s11, "Executive Value Proposition & Recommended Next Steps", "Strategic Impact")
 
     roi_cards = [
         ("60% Faster Closing Cycle", [
@@ -485,10 +565,10 @@ def create_deck(output_path="Konsolidasi_Analyzer_Solution_Architecture.pptx"):
 
     for idx, (title, bullets, col) in enumerate(roi_cards):
         x = Inches(0.8 + idx * 4.03)
-        add_card(s10, x, top_y, Inches(3.64), Inches(4.8), title, bullets, col)
+        add_card(s11, x, top_y, Inches(3.64), Inches(4.8), title, bullets, col)
 
     prs.save(output_path)
-    print(f"White executive presentation created at: {output_path}")
+    print(f"White presentation with live output created at: {output_path}")
 
 if __name__ == "__main__":
     create_deck()
