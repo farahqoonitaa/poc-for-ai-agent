@@ -1,51 +1,50 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Konsolidasi Analyzer — Executive Solution Architecture Deck</title>
+<title>Financial Consolidation Analyzer — Solution Architecture Deck</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
   :root {
-    --bg-dark: #0F2A1D;
-    --forest: #1B4332;
-    --forest-light: #2D6A4F;
-    --sage: #52796F;
-    --gold: #B8902E;
-    --gold-light: #F4EEDC;
-    --cream: #F6F3EC;
+    --bg-page: #F1F5F9;
     --white: #FFFFFF;
-    --ink: #221E18;
-    --ink-muted: #5C564A;
-    --line: #E2DBD0;
-    --danger: #A6402A;
-    --danger-bg: #F9EBE7;
-    --ok: #2D6A4F;
-    --ok-bg: #E4EFE6;
+    --card-bg: #F8FAFC;
+    --primary: #0F172A;
+    --forest: #1B4332;
+    --gold: #B48214;
+    --blue: #0284C7;
+    --text-dark: #1E293B;
+    --text-muted: #64748B;
+    --line: #E2E8F0;
+    --danger: #E11D48;
+    --warn: #D97706;
+    --ok: #0D9488;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background: #1A1917;
-    color: var(--ink);
+    background: var(--bg-page);
+    color: var(--text-dark);
     font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    padding: 20px;
+    padding: 24px;
   }
 
-  /* Presentation Container (16:9 ratio) */
+  /* Presentation Container (16:9 ratio, Pure White) */
   .deck-container {
     width: 100%;
     max-width: 1200px;
     aspect-ratio: 16 / 9;
-    background: var(--cream);
-    border-radius: 12px;
-    box-shadow: 0 14px 40px rgba(0,0,0,0.4);
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.12);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -56,91 +55,98 @@
     display: none;
     width: 100%;
     height: 100%;
-    padding: 50px 60px;
+    padding: 46px 56px;
     flex-direction: column;
-    animation: slideFade .25s ease;
+    animation: slideFade .2s ease;
   }
   .slide.active { display: flex; }
-  @keyframes slideFade { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: none; } }
-
-  /* Slide Types */
-  .slide.dark-slide {
-    background: var(--bg-dark);
-    color: var(--white);
-  }
+  @keyframes slideFade { from { opacity: 0; transform: scale(0.995); } to { opacity: 1; transform: none; } }
 
   /* Slide Typography */
+  .top-accent-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--forest);
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
   .category-tag {
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1.5px;
     color: var(--gold);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
   .slide-title {
     font-family: 'Source Serif 4', Georgia, serif;
-    font-size: 26px;
+    font-size: 25px;
     font-weight: 600;
-    color: var(--forest);
-    margin-bottom: 24px;
+    color: var(--primary);
+    margin-bottom: 22px;
     line-height: 1.25;
-  }
-  .dark-slide .slide-title {
-    color: var(--white);
   }
 
   /* Grids & Cards */
   .grid-3 {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: 18px;
     flex: 1;
   }
   .grid-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 24px;
+    gap: 22px;
     flex: 1;
   }
   .grid-5 {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 14px;
+    gap: 12px;
     flex: 1;
   }
 
   .slide-card {
-    background: var(--white);
+    background: var(--card-bg);
     border: 1px solid var(--line);
     border-radius: 8px;
-    padding: 22px;
+    padding: 20px 22px;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    position: relative;
+    overflow: hidden;
   }
-  .slide-card.border-danger { border-top: 4px solid var(--danger); }
-  .slide-card.border-gold { border-top: 4px solid var(--gold); }
-  .slide-card.border-forest { border-top: 4px solid var(--forest); }
-  .slide-card.border-ok { border-top: 4px solid var(--ok); }
+  .slide-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+  }
+  .slide-card.border-danger::before { background: var(--danger); }
+  .slide-card.border-warn::before { background: var(--warn); }
+  .slide-card.border-forest::before { background: var(--forest); }
+  .slide-card.border-gold::before { background: var(--gold); }
+  .slide-card.border-blue::before { background: var(--blue); }
+  .slide-card.border-ok::before { background: var(--ok); }
 
   .card-title {
-    font-size: 14.5px;
+    font-size: 14px;
     font-weight: 700;
-    color: var(--forest);
+    color: var(--primary);
     margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
   }
   .slide-card ul {
     list-style: none;
-    font-size: 12.5px;
-    color: var(--ink-muted);
+    font-size: 12px;
+    color: var(--text-dark);
     line-height: 1.6;
   }
   .slide-card ul li {
-    margin-bottom: 8px;
+    margin-bottom: 7px;
     position: relative;
     padding-left: 14px;
   }
@@ -148,34 +154,35 @@
     content: "•";
     position: absolute;
     left: 0;
-    color: var(--gold);
+    color: var(--forest);
     font-weight: bold;
   }
 
   /* Presentation Controls */
   .deck-controls {
-    margin-top: 16px;
+    margin-top: 18px;
     display: flex;
     align-items: center;
     gap: 14px;
-    color: #AAA;
+    color: var(--text-muted);
     font-size: 13px;
   }
   .ctrl-btn {
-    background: #2E2D2A;
-    border: 1px solid #444;
-    color: #FFF;
+    background: var(--white);
+    border: 1px solid var(--line);
+    color: var(--primary);
     padding: 8px 16px;
     border-radius: 6px;
     font-size: 12.5px;
     font-weight: 600;
     cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     transition: all .15s;
   }
-  .ctrl-btn:hover { background: var(--forest); border-color: var(--forest); }
+  .ctrl-btn:hover { background: var(--card-bg); border-color: var(--forest); color: var(--forest); }
   .slide-counter { font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
   .back-btn {
-    color: var(--gold);
+    color: var(--forest);
     text-decoration: none;
     font-size: 12.5px;
     font-weight: 600;
@@ -187,55 +194,59 @@
 <body>
 
 <div class="deck-container" id="deck">
+  <div class="top-accent-bar"></div>
 
-  <!-- SLIDE 1: TITLE SLIDE -->
-  <div class="slide dark-slide active">
-    <div style="margin-top: auto; margin-bottom: auto; max-width: 900px;">
-      <div style="width: 60px; height: 4px; background: var(--gold); margin-bottom: 20px;"></div>
-      <div class="category-tag">EXECUTIVE PRESENTATION &bull; SOLUTION ARCHITECTURE</div>
-      <h1 style="font-family:'Source Serif 4',serif; font-size:40px; line-height:1.2; font-weight:600; margin-bottom:12px;">
-        Konsolidasi Analyzer & Review Workspace
+  <!-- SLIDE 1: TITLE SLIDE (White Minimalist Executive) -->
+  <div class="slide active">
+    <div style="margin-top: auto; margin-bottom: auto; max-width: 960px; border-left: 4px solid var(--forest); padding-left: 28px;">
+      <div class="category-tag">ENTERPRISE SOLUTION ARCHITECTURE &bull; WHITE EDITION</div>
+      <h1 style="font-family:'Source Serif 4',serif; font-size:36px; line-height:1.2; font-weight:700; color:var(--primary); margin-bottom:8px;">
+        Financial Consolidation Analyzer & Review Workspace
       </h1>
-      <h2 style="font-size:20px; font-weight:400; color:var(--gold); margin-bottom:24px;">
+      <h2 style="font-size:18px; font-weight:600; color:var(--forest); margin-bottom:18px;">
         AI Forensic Copilot & Human-in-the-Loop Audit Intelligence
       </h2>
-      <p style="font-size:14px; color:#D8D2C6; line-height:1.6;">
-        Solusi otomatisasi telaah konsolidasi laporan keuangan, deteksi anomali PSAK 65 (NCI) dan PSAK 7 (Afiliasi), serta tracking review auditor internal untuk Yayasan dan 5 Anak Perusahaan.
+      <p style="font-size:13.5px; color:var(--text-muted); line-height:1.6;">
+        An automated system for multi-entity financial consolidation review, mathematical anomaly detection (IFRS 10 / PSAK 65 NCI & IAS 24 / PSAK 7 Related Parties), and internal audit sign-off workflows across Holding and 5 Operating Subsidiaries.
       </p>
     </div>
-    <div style="font-size:11.5px; color:#8E887C; border-top:1px solid #2B3A31; padding-top:14px; display:flex; justify-content:space-between;">
-      <span>Entitas: Yayasan (Induk) &bull; PT Anak I – V</span>
-      <span>Antigravity Advisory &bull; September 2026</span>
+    <div style="background:var(--card-bg); border:1px solid var(--line); border-radius:6px; padding:12px 18px; display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-muted);">
+      <span><strong>Scope:</strong> Holding Foundation & 5 Subsidiaries (PT Anak I – V)</span>
+      <span><strong>Standards:</strong> IFRS 10 / PSAK 65 &bull; IAS 24 / PSAK 7 &bull; POJK Prudential Ratios</span>
+      <span>September 2026</span>
     </div>
   </div>
 
-  <!-- SLIDE 2: THE EXECUTIVE CHALLENGE -->
+  <!-- SLIDE 2: THE CONSOLIDATION CHALLENGE -->
   <div class="slide">
-    <div class="category-tag">LATAR BELAKANG & MASALAH</div>
-    <h2 class="slide-title">Tantangan Kritis Konsolidasi Finansial Multientitas</h2>
+    <div class="category-tag">PROBLEM STATEMENT & CONTEXT</div>
+    <h2 class="slide-title">The Multi-Entity Consolidation Challenge</h2>
     <div class="grid-3">
       <div class="slide-card border-danger">
-        <div class="card-title">1. Kebocoran Alokasi NCI (PSAK 65)</div>
+        <div class="card-title" style="color:var(--danger);">1. NCI Profit Allocation Leakage (IFRS 10)</div>
         <ul>
-          <li>Kepemilikan minoritas (22% - 40%) pada 4 anak perusahaan rawan deviasi matematis.</li>
-          <li><strong>Kasus PT Anak II:</strong> Laba NCI dilaporkan 24.4 M vs porsi proporsional 18.2 M (selisih +34.1%).</li>
-          <li>Menyebabkan laba induk tersaji terlalu rendah (understated) atau indikasi dividen terselubung.</li>
+          <li>Minority interests (NCI 22% - 40%) across 4 operating subsidiaries are prone to manual calculation errors.</li>
+          <li><strong>Case in Point:</strong> Subsidiary II reported NCI profit share of $24.4M vs statutory $18.2M (+34.1% gap).</li>
+          <li>Distorts parent net income downwards or masks disguised profit extractions.</li>
+          <li>Traditional spreadsheets lack automated mathematical reconciliation of effective minority stakes.</li>
         </ul>
       </div>
-      <div class="slide-card border-gold">
-        <div class="card-title">2. Lonjakan Piutang Afiliasi (PSAK 7)</div>
+      <div class="slide-card border-warn">
+        <div class="card-title" style="color:var(--warn);">2. Related-Party Debt Spikes (IAS 24)</div>
         <ul>
-          <li>Piutang pihak berelasi melonjak drastis tanpa diimbangi peningkatan omzet entitas.</li>
-          <li><strong>Kasus PT Anak II:</strong> Piutang afiliasi melesat +158.8% YoY sementara pendapatan hanya tumbuh +4.9%.</li>
-          <li>Risiko likuiditas terserap ke afiliasi dan potensi bad debts internal tanpa mitigasi.</li>
+          <li>Intercompany receivables frequently surge without commensurate commercial revenue growth.</li>
+          <li><strong>Case in Point:</strong> Subsidiary II related-party receivables spiked +158.8% YoY while revenue grew just +4.9%.</li>
+          <li>Holding liquidity becomes trapped in affiliated entities under non-arms-length terms.</li>
+          <li>Increases intercompany elimination friction and uncollectible debt exposure.</li>
         </ul>
       </div>
-      <div class="slide-card border-forest">
-        <div class="card-title">3. Fragmentasi Jejak Audit</div>
+      <div class="slide-card border-blue">
+        <div class="card-title" style="color:var(--blue);">3. Fragmented Audit Trails</div>
         <ul>
-          <li>Review konsolidasi terpecah di spreadsheet terpisah dan komunikasi email tidak terlacak.</li>
-          <li>Komite Audit dan CFO tidak memiliki visibilitas atas status klarifikasi temuan.</li>
-          <li>Tidak ada lembar pengesahan (sign-off) terpusat sebelum laporan diajukan ke audit eksternal.</li>
+          <li>Consolidation workpapers and variance inquiries are scattered across email threads and disconnected sheets.</li>
+          <li>Audit Committee and Group CFO lack real-time visibility into anomaly resolution statuses.</li>
+          <li>No centralized tracking distinguishes accepted operational variances from required audit adjustments.</li>
+          <li>Critical errors are often discovered late during external auditor year-end field examinations.</li>
         </ul>
       </div>
     </div>
@@ -243,25 +254,27 @@
 
   <!-- SLIDE 3: DUAL-ENGINE SOLUTION VISION -->
   <div class="slide">
-    <div class="category-tag">VISI ARSITEKTUR</div>
-    <h2 class="slide-title">Solusi: Deterministic Accounting Math + Cognitive AI Copilot</h2>
+    <div class="category-tag">CORE ARCHITECTURE</div>
+    <h2 class="slide-title">Dual-Engine Architecture: Precision Math + Cognitive AI</h2>
     <div class="grid-2">
       <div class="slide-card border-forest">
-        <div class="card-title">Engine 1: Deterministic Accounting Engine</div>
+        <div class="card-title" style="color:var(--forest);">Engine 1: Deterministic Accounting Engine</div>
         <ul>
-          <li><strong>Perhitungan Agregat 100% Presisi:</strong> Menjumlahkan revenue, laba bersih, aset, dan ekuitas seluruh entitas.</li>
-          <li><strong>Kalkulasi NCI PSAK 65:</strong> Mengalokasikan hak laba minoritas secara matematis tanpa manipulasi.</li>
-          <li><strong>Rule Engine Forensik:</strong> Otomatis mengevaluasi ambang batas deviasi matematis.</li>
-          <li><strong>Zero Black-Box:</strong> Semua angka memiliki formula transparan dan dapat diaudit ulang.</li>
+          <li><strong>100% Mathematical Precision:</strong> Rigorous aggregation of Revenues, Net Income, Assets, Liabilities, and Equity.</li>
+          <li><strong>Automated Intercompany Eliminations:</strong> Standardized matrices eliminate cross-holdings and reciprocal debt.</li>
+          <li><strong>Statutory NCI Attribution:</strong> Precise IFRS 10 formulas calculate parent earnings vs minority equity claims.</li>
+          <li><strong>Zero Black-Box Calculations:</strong> Every number is derived from transparent, reproducible accounting formulas.</li>
+          <li><strong>Instant Dynamic Recalculation:</strong> Input modifications dynamically update solvency and profitability indicators.</li>
         </ul>
       </div>
       <div class="slide-card border-gold">
-        <div class="card-title">Engine 2: Cognitive AI Forensic Copilot</div>
+        <div class="card-title" style="color:var(--gold);">Engine 2: Cognitive AI Forensic Copilot</div>
         <ul>
-          <li><strong>Conversational Assistant:</strong> Menjawab pertanyaan pimpinan dalam bahasa analis keuangan.</li>
-          <li><strong>Forensic Reasoning:</strong> Menjelaskan akar masalah anomali dan risiko kepatuhan hukumnya.</li>
-          <li><strong>Interactive Review Workspace:</strong> Menyediakan kontrol status audit (Klarifikasi / Temuan / Disetujui).</li>
-          <li><strong>OJK Benchmarking:</strong> Mengkomparasikan DER (0.96x) & ROA (5.4%) dengan rata-rata sektor keuangan.</li>
+          <li><strong>Conversational Copilot:</strong> Answers executive inquiries in natural, professional corporate finance language.</li>
+          <li><strong>Forensic Root-Cause Reasoning:</strong> Translates raw numerical deltas into concrete audit and compliance risk rationales.</li>
+          <li><strong>Actionable Review Workspace:</strong> Empowers auditors to mark items as Clarify, Audit Finding, or Approved.</li>
+          <li><strong>Contextual Smart Navigation:</strong> Conversational insights feature direct jump buttons to highlighted review cards.</li>
+          <li><strong>Prudential Benchmarking:</strong> Contextualizes group leverage (DER 0.96x) and returns (ROA 5.4%) against sector standards.</li>
         </ul>
       </div>
     </div>
@@ -269,96 +282,96 @@
 
   <!-- SLIDE 4: 5-TIER TECHNICAL BLUEPRINT -->
   <div class="slide">
-    <div class="category-tag">BLUEPRINT TEKNIS</div>
-    <h2 class="slide-title">Arsitektur Solusi 5-Tier End-to-End</h2>
+    <div class="category-tag">SYSTEM ARCHITECTURE</div>
+    <h2 class="slide-title">End-to-End 5-Tier Technical Blueprint</h2>
     <div class="grid-5">
-      <div class="slide-card">
-        <div style="font-size:10.5px; color:var(--gold); font-weight:700;">TIER 1</div>
-        <div style="font-size:13px; font-weight:700; color:var(--forest); margin:4px 0 8px;">Ingestion</div>
-        <ul style="font-size:11.5px;">
+      <div class="slide-card border-forest">
+        <div style="font-size:10px; color:var(--gold); font-weight:700;">TIER 1</div>
+        <div style="font-size:13px; font-weight:700; color:var(--primary); margin:4px 0 8px;">Ingestion</div>
+        <ul style="font-size:11px;">
           <li>ERP / SAP / Oracle GL</li>
-          <li>Excel & XBRL Parser</li>
-          <li>Data Cleansing & CY/PY Validation</li>
+          <li>Excel & XBRL Ingestor</li>
+          <li>CY & PY Data Sanity Checks</li>
         </ul>
       </div>
-      <div class="slide-card">
-        <div style="font-size:10.5px; color:var(--gold); font-weight:700;">TIER 2</div>
-        <div style="font-size:13px; font-weight:700; color:var(--forest); margin:4px 0 8px;">Consolidation</div>
-        <ul style="font-size:11.5px;">
-          <li>Agregator Multientitas</li>
-          <li>Eliminasi Intercompany</li>
-          <li>Kalkulasi NCI PSAK 65</li>
+      <div class="slide-card border-forest">
+        <div style="font-size:10px; color:var(--gold); font-weight:700;">TIER 2</div>
+        <div style="font-size:13px; font-weight:700; color:var(--primary); margin:4px 0 8px;">Consolidation</div>
+        <ul style="font-size:11px;">
+          <li>Multi-Entity Aggregator</li>
+          <li>Elimination Engine</li>
+          <li>IFRS 10 NCI Attribution</li>
         </ul>
       </div>
-      <div class="slide-card">
-        <div style="font-size:10.5px; color:var(--gold); font-weight:700;">TIER 3</div>
-        <div style="font-size:13px; font-weight:700; color:var(--forest); margin:4px 0 8px;">Forensic Rules</div>
-        <ul style="font-size:11.5px;">
-          <li>Deteksi Mismatch NCI</li>
-          <li>Spike Piutang Relasi</li>
-          <li>Spike DER & Margin</li>
+      <div class="slide-card border-danger">
+        <div style="font-size:10px; color:var(--danger); font-weight:700;">TIER 3</div>
+        <div style="font-size:13px; font-weight:700; color:var(--primary); margin:4px 0 8px;">Forensic Rules</div>
+        <ul style="font-size:11px;">
+          <li>NCI Mismatch Vector</li>
+          <li>Related-Party Spike Detector</li>
+          <li>Leverage & Margin Scanners</li>
         </ul>
       </div>
-      <div class="slide-card">
-        <div style="font-size:10.5px; color:var(--gold); font-weight:700;">TIER 4</div>
-        <div style="font-size:13px; font-weight:700; color:var(--forest); margin:4px 0 8px;">AI Copilot</div>
-        <ul style="font-size:11.5px;">
-          <li>Orchestrator Agent</li>
-          <li>Forensic Explainer</li>
-          <li>Benchmarking OJK</li>
+      <div class="slide-card border-gold">
+        <div style="font-size:10px; color:var(--gold); font-weight:700;">TIER 4</div>
+        <div style="font-size:13px; font-weight:700; color:var(--primary); margin:4px 0 8px;">AI Copilot</div>
+        <ul style="font-size:11px;">
+          <li>Multi-Agent Orchestrator</li>
+          <li>Forensic Explainer Agent</li>
+          <li>Regulatory Benchmark Agent</li>
         </ul>
       </div>
-      <div class="slide-card">
-        <div style="font-size:10.5px; color:var(--gold); font-weight:700;">TIER 5</div>
-        <div style="font-size:13px; font-weight:700; color:var(--forest); margin:4px 0 8px;">Review UI</div>
-        <ul style="font-size:11.5px;">
-          <li>Chat Split View</li>
-          <li>Review Action Cards</li>
-          <li>Sign-off & Print PDF</li>
+      <div class="slide-card border-blue">
+        <div style="font-size:10px; color:var(--blue); font-weight:700;">TIER 5</div>
+        <div style="font-size:13px; font-weight:700; color:var(--primary); margin:4px 0 8px;">Review UI</div>
+        <ul style="font-size:11px;">
+          <li>Interactive Split View</li>
+          <li>Review Decision Cards</li>
+          <li>Formal Sign-off & PDF Export</li>
         </ul>
       </div>
     </div>
   </div>
 
-  <!-- SLIDE 5: FORENSIC RULES & THRESHOLDS -->
+  <!-- SLIDE 5: FORENSIC ANOMALY RULES -->
   <div class="slide">
-    <div class="category-tag">MESIN DETEKSI ANOMALI</div>
-    <h2 class="slide-title">4 Vektor Pemeriksaan Forensik & Ambang Deviasi</h2>
+    <div class="category-tag">QUANTITATIVE RULES</div>
+    <h2 class="slide-title">Forensic Anomaly Detection Engine: Vectors & Thresholds</h2>
     <div style="display:flex; flex-direction:column; gap:12px; flex:1;">
-      <div style="background:#FFF; border-left:5px solid var(--danger); padding:14px 18px; border-radius:6px; border:1px solid var(--line); border-left-width:5px;">
-        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:13.5px; color:var(--forest);">
-          <span>1. Ketidaksesuaian Alokasi Laba ke NCI (PSAK 65)</span>
-          <span style="color:var(--danger);">[KRITIS] Ambang: >8% Deviasi</span>
+      <div style="background:var(--card-bg); border-left:4px solid var(--danger); padding:14px 18px; border-radius:6px; border:1px solid var(--line); border-left-width:4px;">
+        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:13px; color:var(--primary);">
+          <span>1. NCI Profit Allocation Disparity</span>
+          <span style="color:var(--danger);">[CRITICAL] Threshold: |Reported NCI - Computed NCI| > 8%</span>
         </div>
-        <div style="font-size:12px; color:var(--ink-muted); margin-top:4px;">
-          Mendeteksi ketidakselarasan antara persentase kepemilikan NCI sah dengan nilai laba yang dibebankan pada laporan keuangan konsolidasian.
-        </div>
-      </div>
-      <div style="background:#FFF; border-left:5px solid var(--danger); padding:14px 18px; border-radius:6px; border:1px solid var(--line); border-left-width:5px;">
-        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:13.5px; color:var(--forest);">
-          <span>2. Lonjakan Piutang Berelasi Tidak Sebanding (PSAK 7)</span>
-          <span style="color:var(--danger);">[KRITIS] Ambang: ΔPiutang - ΔRev > 30%</span>
-        </div>
-        <div style="font-size:12px; color:var(--ink-muted); margin-top:4px;">
-          Mengidentifikasi aliran kas keluar ke entitas terafiliasi yang tidak tercermin dalam ekspansi pendapatan komersial anak perusahaan.
+        <div style="font-size:11.8px; color:var(--text-muted); margin-top:3px;">
+          Prevents parent income distortion and safeguards minority shareholder dividend equity under IFRS 10 / PSAK 65.
         </div>
       </div>
-      <div style="background:#FFF; border-left:5px solid var(--gold); padding:14px 18px; border-radius:6px; border:1px solid var(--line); border-left-width:5px;">
-        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:13.5px; color:var(--forest);">
-          <span>3. Kenaikan Leverage / DER Signifikan</span>
-          <span style="color:var(--gold);">[SEDANG] Ambang: Kenaikan DER > 18%</span>
+      <div style="background:var(--card-bg); border-left:4px solid var(--danger); padding:14px 18px; border-radius:6px; border:1px solid var(--line); border-left-width:4px;">
+        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:13px; color:var(--primary);">
+          <span>2. Related-Party Debt Acceleration</span>
+          <span style="color:var(--danger);">[CRITICAL] Threshold: ΔRP Receivables - ΔRevenue > 30%</span>
         </div>
-        <div style="font-size:12px; color:var(--ink-muted); margin-top:4px;">
-          Mengawasi rasio utang terhadap ekuitas entitas anak agar tidak melanggar batasan POJK dan perjanjian kredit perbankan.
+        <div style="font-size:11.8px; color:var(--text-muted); margin-top:3px;">
+          Detects liquidity outflows into affiliated entities and halts hidden internal non-performing debt under IAS 24 / PSAK 7.
         </div>
       </div>
-      <div style="background:#FFF; border-left:5px solid var(--sage); padding:14px 18px; border-radius:6px; border:1px solid var(--line); border-left-width:5px;">
-        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:13.5px; color:var(--forest);">
-          <span>4. Pergeseran Net Profit Margin (>3.5 percentage points)</span>
-          <span style="color:var(--sage);">[RENDAH / SEDANG] Ambang: |ΔMargin| ≥ 3.5pp</span>
+      <div style="background:var(--card-bg); border-left:4px solid var(--warn); padding:14px 18px; border-radius:6px; border:1px solid var(--line); border-left-width:4px;">
+        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:13px; color:var(--primary);">
+          <span>3. Sudden Leverage / DER Escalation</span>
+          <span style="color:var(--warn);">[MEDIUM] Threshold: DER CY / DER PY - 1 > 18%</span>
         </div>
-        <div style="font-size:12px; color:var(--ink-muted); margin-top:4px;">
-          Memverifikasi apakah lonjakan atau kejatuhan margin berasal dari operasional murni atau keuntungan satu kali (one-off gain).
+        <div style="font-size:11.8px; color:var(--text-muted); margin-top:3px;">
+          Monitors subsidiary debt growth before debt-to-equity ratios breach bank debt covenants or regulatory limits.
+        </div>
+      </div>
+      <div style="background:var(--card-bg); border-left:4px solid var(--ok); padding:14px 18px; border-radius:6px; border:1px solid var(--line); border-left-width:4px;">
+        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:13px; color:var(--primary);">
+          <span>4. Profit Margin Distortion</span>
+          <span style="color:var(--ok);">[MODERATE] Threshold: |Margin CY - Margin PY| ≥ 3.5 pp</span>
+        </div>
+        <div style="font-size:11.8px; color:var(--text-muted); margin-top:3px;">
+          Verifies whether margin expansion/compression stems from genuine operations or one-off artificial transactions.
         </div>
       </div>
     </div>
@@ -366,66 +379,66 @@
 
   <!-- SLIDE 6: REVIEW WORKSPACE & HITL WORKFLOW -->
   <div class="slide">
-    <div class="category-tag">HUMAN-IN-THE-LOOP</div>
-    <h2 class="slide-title">Workspace "Hasil yang Perlu Di-Review" & Siklus Keputusan</h2>
+    <div class="category-tag">AUDIT OPERATIONS</div>
+    <h2 class="slide-title">Actionable Review Workspace: Human-in-the-Loop Workflow</h2>
     <div class="grid-3">
-      <div class="slide-card border-gold">
-        <div class="card-title">1. Review Status Tracker</div>
+      <div class="slide-card border-danger">
+        <div class="card-title" style="color:var(--danger);">Step 1: Automated Flagging</div>
         <ul>
-          <li>Status visual: <code>Belum Di-review</code>, <code>Perlu Klarifikasi</code>, <code>Temuan Audit</code>, <code>Disetujui</code>.</li>
-          <li>Menampilkan progres penyelesaian secara real-time.</li>
-          <li>Filter cepat untuk fokus pada temuan kritis berisiko tinggi.</li>
+          <li>Rule Engine scans all 6 entities instantly upon data change.</li>
+          <li>Anomalies classified by severity: Critical, Medium, Moderate.</li>
+          <li>Dynamic status pills track: Pending, Clarification, Finding, Approved.</li>
+        </ul>
+      </div>
+      <div class="slide-card border-gold">
+        <div class="card-title" style="color:var(--gold);">Step 2: Auditor Decisions & Notes</div>
+        <ul>
+          <li>Auditor sets status: Clarify / Audit Finding / Approved.</li>
+          <li>Dedicated note field captures remarks & requested reconciliation.</li>
+          <li>One-click 'Request Clarification' logs formal notice to subsidiary CFO.</li>
         </ul>
       </div>
       <div class="slide-card border-forest">
-        <div class="card-title">2. Auditor Action Panel</div>
+        <div class="card-title" style="color:var(--forest);">Step 3: Formal Sign-off & PDF</div>
         <ul>
-          <li>Setiap kartu temuan dilengkapi dropdown keputusan audit.</li>
-          <li>Kolom catatan reviewer untuk mendokumentasikan alasan persetujuan.</li>
-          <li>Tombol instan <em>"Kirim Notif Entitas"</em> untuk menerbitkan permintaan penjelasan ke anak perusahaan.</li>
-        </ul>
-      </div>
-      <div class="slide-card border-ok">
-        <div class="card-title">3. Pengesahan & Sign-off</div>
-        <ul>
-          <li>Tombol penguncian lembar kerja review tertanggal otomatis.</li>
-          <li>Sinkronisasi otomatis ke chat log sebagai bukti jejak audit.</li>
-          <li>Fasilitas cetak langsung ke format PDF ramah audit rapat komite.</li>
+          <li>Real-time tracking: X of Y anomalies reviewed.</li>
+          <li>Formal sign-off locks workpaper with timestamp and reviewer credentials.</li>
+          <li>One-click clean print to PDF ready for the Audit Committee presentation.</li>
         </ul>
       </div>
     </div>
   </div>
 
-  <!-- SLIDE 7: SECTORAL & OJK BENCHMARKING -->
+  <!-- SLIDE 7: REGULATORY & SECTORAL BENCHMARKS -->
   <div class="slide">
-    <div class="category-tag">ANALISIS SEKTORAL</div>
-    <h2 class="slide-title">Kesehatan Finansial Konsolidasi vs Regulasi OJK</h2>
+    <div class="category-tag">PRUDENTIAL RATIOS</div>
+    <h2 class="slide-title">Consolidated Financial Health vs. Sectoral Benchmarks</h2>
     <div class="grid-3">
       <div class="slide-card border-ok">
-        <div class="card-title">Solvabilitas (DER)</div>
-        <div style="font-size:22px; font-weight:700; font-family:'IBM Plex Mono'; color:var(--ok); margin:6px 0;">0.96x</div>
-        <div style="font-size:11.5px; color:var(--ink-muted); margin-bottom:12px;">Batas Maks POJK: <strong>5.0x</strong></div>
+        <div class="card-title">Solvency (DER)</div>
+        <div style="font-size:24px; font-weight:700; font-family:'IBM Plex Mono'; color:var(--ok); margin:6px 0;">0.96x</div>
+        <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px;">Regulatory Ceiling: <strong>Max 5.0x</strong></div>
         <ul>
-          <li>Struktur permodalan sangat konservatif.</li>
-          <li>Memberikan ruang likuiditas luas bagi ekspansi bisnis holding.</li>
+          <li>Capital structure provides ample liquidity buffer for operational growth.</li>
+          <li>Well below regulatory leverage thresholds for financial institutions.</li>
         </ul>
       </div>
       <div class="slide-card border-ok">
-        <div class="card-title">Rentabilitas (ROA)</div>
-        <div style="font-size:22px; font-weight:700; font-family:'IBM Plex Mono'; color:var(--ok); margin:6px 0;">5.4%</div>
-        <div style="font-size:11.5px; color:var(--ink-muted); margin-bottom:12px;">Rata-rata Industri: <strong>3.5% - 5.2%</strong></div>
+        <div class="card-title">Profitability (ROA)</div>
+        <div style="font-size:24px; font-weight:700; font-family:'IBM Plex Mono'; color:var(--ok); margin:6px 0;">5.4%</div>
+        <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px;">Industry Average: <strong>3.5% - 5.2%</strong></div>
         <ul>
-          <li>Tergolong outperforming dibandingkan benchmark multifinance mikro.</li>
-          <li>Pertumbuhan laba bersih konsolidasi mencapai +14.2% YoY.</li>
+          <li>Group asset return sits in the upper quartile of microfinance peers.</li>
+          <li>Consolidated Net Income expanded +14.2% YoY ($325M vs $284.7M).</li>
         </ul>
       </div>
-      <div class="slide-card border-gold">
-        <div class="card-title">Piutang Afiliasi (RP)</div>
-        <div style="font-size:22px; font-weight:700; font-family:'IBM Plex Mono'; color:var(--gold); margin:6px 0;">241 M (4.3%)</div>
-        <div style="font-size:11.5px; color:var(--ink-muted); margin-bottom:12px;">Fokus: <strong>Konsentrasi PT Anak II</strong></div>
+      <div class="slide-card border-warn">
+        <div class="card-title">Affiliated Debt (RP)</div>
+        <div style="font-size:24px; font-weight:700; font-family:'IBM Plex Mono'; color:var(--warn); margin:6px 0;">$241M (4.3%)</div>
+        <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px;">Concentration: <strong>Subsidiary II Watch</strong></div>
         <ul>
-          <li>Secara konsolidasi proporsional terhadap total aset.</li>
-          <li>Namun konsentrasi di PT Anak II (88 M) wajib dimonitor ketat.</li>
+          <li>Aggregate exposure is proportional to balance sheet scale.</li>
+          <li>However, concentration at Subsidiary II ($88M) warrants tight monitoring.</li>
         </ul>
       </div>
     </div>
@@ -433,82 +446,88 @@
 
   <!-- SLIDE 8: STAKEHOLDER ALIGNMENT MATRIX -->
   <div class="slide">
-    <div class="category-tag">STAKEHOLDER ALIGNMENT</div>
-    <h2 class="slide-title">Matriks Keselarasan Ekspektasi Pemangku Kepentingan</h2>
-    <div style="display:flex; flex-direction:column; gap:10px; flex:1;">
-      <div style="background:#FFF; border:1px solid var(--line); border-radius:6px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center;">
-        <div><strong>Komite Audit / Pengawas:</strong> "Mencegah salah saji material dan kebocoran laba NCI."</div>
-        <div style="color:var(--forest); font-weight:600; font-size:12px;">✓ Rule engine PSAK 65 & ranking anomali otomatis</div>
+    <div class="category-tag">VALUE DELIVERY</div>
+    <h2 class="slide-title">Stakeholder Expectation Alignment Matrix</h2>
+    <div style="display:flex; flex-direction:column; gap:9px; flex:1;">
+      <div style="background:var(--card-bg); border:1px solid var(--line); border-radius:6px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center;">
+        <div><strong>Audit Committee:</strong> "Prevent material misstatements & NCI leakage prior to external audits."</div>
+        <div style="color:var(--forest); font-weight:600; font-size:12px;">✓ Automated IFRS 10 rule engine & critical anomaly ranking</div>
       </div>
-      <div style="background:#FFF; border:1px solid var(--line); border-radius:6px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center;">
-        <div><strong>CFO Yayasan / Holding:</strong> "Mempercepat closing konsolidasi tanpa risiko human error."</div>
-        <div style="color:var(--forest); font-weight:600; font-size:12px;">✓ Ringkasan KPI instan, kalkulasi otomatis, copilot interaktif</div>
+      <div style="background:var(--card-bg); border:1px solid var(--line); border-radius:6px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center;">
+        <div><strong>Group CFO:</strong> "Accelerate group consolidation closing cycles with zero arithmetic risk."</div>
+        <div style="color:var(--forest); font-weight:600; font-size:12px;">✓ Instant KPI summaries, sensitivity simulations, board-ready briefs</div>
       </div>
-      <div style="background:#FFF; border:1px solid var(--line); border-radius:6px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center;">
-        <div><strong>Tim Internal Audit:</strong> "Kertas kerja telaah yang memiliki audit trail sah dan terlacak."</div>
-        <div style="color:var(--forest); font-weight:600; font-size:12px;">✓ Workspace review dengan catatan auditor & formal sign-off</div>
+      <div style="background:var(--card-bg); border:1px solid var(--line); border-radius:6px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center;">
+        <div><strong>Internal Audit:</strong> "Maintain structured electronic workpapers with traceable sign-offs."</div>
+        <div style="color:var(--forest); font-weight:600; font-size:12px;">✓ Actionable Review Workspace with item status & timestamped audit trails</div>
       </div>
-      <div style="background:#FFF; border:1px solid var(--line); border-radius:6px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center;">
-        <div><strong>CFO Anak Perusahaan:</strong> "Transparansi perhitungan eliminasi & rekonsiliasi yang adil."</div>
-        <div style="color:var(--forest); font-weight:600; font-size:12px;">✓ Rincian deviasi disajikan angka demi angka</div>
+      <div style="background:var(--card-bg); border:1px solid var(--line); border-radius:6px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center;">
+        <div><strong>Subsidiary CFOs:</strong> "Ensure transparent, fair elimination and reconciliation calculations."</div>
+        <div style="color:var(--forest); font-weight:600; font-size:12px;">✓ Line-by-line breakdown allows rapid cross-checking with subsidiary GLs</div>
       </div>
     </div>
   </div>
 
   <!-- SLIDE 9: IMPLEMENTATION ROADMAP -->
   <div class="slide">
-    <div class="category-tag">ROADMAP PRODUKSI</div>
-    <h2 class="slide-title">Rencana Implementasi Bertahap Menuju Produksi Penuh</h2>
+    <div class="category-tag">DEPLOYMENT PLAN</div>
+    <h2 class="slide-title">Phased Enterprise Implementation Roadmap</h2>
     <div class="grid-3">
       <div class="slide-card border-ok">
-        <div class="card-title">Fase 1: Working PoC (Selesai)</div>
+        <div class="card-title" style="color:var(--ok);">Phase 1: Working PoC (Delivered)</div>
         <ul>
-          <li>Rule engine konsolidasi 6 entitas tervalidasi.</li>
-          <li>AI Forensic Copilot dengan prompt pills.</li>
-          <li>Review Workspace "Hasil yang Perlu Di-Review".</li>
-          <li>Live localhost & GitHub repository terpasang.</li>
+          <li>Consolidation rule engine validated for 6 entities.</li>
+          <li>Conversational AI Copilot with quick-action chips.</li>
+          <li>Actionable 'Review Workspace' for anomaly tracking.</li>
+          <li>Self-contained local execution & GitHub repository.</li>
         </ul>
       </div>
       <div class="slide-card border-gold">
-        <div class="card-title">Fase 2: Integrasi & Pilot (Bln 2-3)</div>
+        <div class="card-title" style="color:var(--gold);">Phase 2: Integration & Pilot (M2-3)</div>
         <ul>
-          <li>Konektor otomatis ke GL/ERP anak perusahaan.</li>
-          <li>Database snapshot point-in-time tersimpan aman.</li>
-          <li>Workflow notifikasi email/chat otomatis ke anak usaha.</li>
-          <li>Pilot pengujian paralel dengan audit tahun sebelumnya.</li>
+          <li>Direct ERP/GL database connectors (SAP/Oracle).</li>
+          <li>Immutable point-in-time snapshot database store.</li>
+          <li>Automated email/chat notification dispatch to subsidiaries.</li>
+          <li>Parallel dry-run benchmarked against prior-year audited data.</li>
         </ul>
       </div>
       <div class="slide-card border-forest">
-        <div class="card-title">Fase 3: Enterprise (Bln 4+)</div>
+        <div class="card-title" style="color:var(--forest);">Phase 3: Enterprise Rollout (M4+)</div>
         <ul>
-          <li>Multi-tenant RBAC & Single Sign-On (SSO).</li>
-          <li>Elimination engine otomatis tingkat transaksi (full GL).</li>
-          <li>Portal telaah formal untuk auditor eksternal (KAP).</li>
+          <li>Multi-tenant Role-Based Access Control (RBAC) & SSO.</li>
+          <li>Transaction-level automated intercompany elimination.</li>
+          <li>Dedicated secure portal for external audit review teams.</li>
         </ul>
       </div>
     </div>
   </div>
 
   <!-- SLIDE 10: CONCLUSION & NEXT STEPS -->
-  <div class="slide dark-slide">
-    <div style="margin-top:auto; margin-bottom:auto; max-width:960px;">
-      <div class="category-tag">KESIMPULAN EKSEKUTIF</div>
-      <h2 style="font-family:'Source Serif 4',serif; font-size:32px; color:var(--white); margin-bottom:14px;">
-        Transformasi Pengawasan Konsolidasi: Cepat, Akurat, dan Akuntabel
-      </h2>
-      <div class="grid-3" style="margin-top:24px;">
-        <div style="background:var(--forest); padding:20px; border-radius:8px; border:1px solid var(--gold);">
-          <div style="font-size:18px; font-weight:700; color:var(--gold); margin-bottom:8px;">60% Lebih Cepat</div>
-          <p style="font-size:12.5px; color:#D8D2C6; line-height:1.5;">Otomasi deteksi anomali matematis dan alokasi NCI mempercepat siklus penutupan buku holding.</p>
-        </div>
-        <div style="background:var(--forest); padding:20px; border-radius:8px; border:1px solid var(--gold);">
-          <div style="font-size:18px; font-weight:700; color:var(--gold); margin-bottom:8px;">100% Kepatuhan</div>
-          <p style="font-size:12.5px; color:#D8D2C6; line-height:1.5;">Pemantauan penuh atas kepatuhan standar PSAK 65, PSAK 7, dan batas solvabilitas POJK.</p>
-        </div>
-        <div style="background:var(--forest); padding:20px; border-radius:8px; border:1px solid var(--gold);">
-          <div style="font-size:18px; font-weight:700; color:var(--gold); margin-bottom:8px;">Langkah Lanjut</div>
-          <p style="font-size:12.5px; color:#D8D2C6; line-height:1.5;">Presentasi ke Komite Audit, uji coba data historis, dan aktivasi konektor GL entitas.</p>
-        </div>
+  <div class="slide">
+    <div class="category-tag">STRATEGIC IMPACT</div>
+    <h2 class="slide-title">Executive Value Proposition & Next Steps</h2>
+    <div class="grid-3">
+      <div class="slide-card border-forest">
+        <div class="card-title" style="color:var(--forest);">60% Faster Closing Cycles</div>
+        <ul>
+          <li>Automated anomaly screening eliminates tedious manual spreadsheet reconciliations.</li>
+          <li>Immediate flagging of NCI disparities removes late-stage closing bottlenecks.</li>
+        </ul>
+      </div>
+      <div class="slide-card border-gold">
+        <div class="card-title" style="color:var(--gold);">100% Audit Readiness</div>
+        <ul>
+          <li>Continuous adherence to IFRS 10 (NCI) and IAS 24 (Related Parties).</li>
+          <li>Complete digital audit trail protects holding executives and board members.</li>
+        </ul>
+      </div>
+      <div class="slide-card border-blue">
+        <div class="card-title" style="color:var(--blue);">Recommended Next Steps</div>
+        <ul>
+          <li>1. Present PoC findings to the Audit Committee and Group CFO.</li>
+          <li>2. Execute pilot validation using 2025 audited financial statements.</li>
+          <li>3. Establish direct subsidiary GL connectors for automated data feeds.</li>
+        </ul>
       </div>
     </div>
   </div>
@@ -520,7 +539,7 @@
   <button class="ctrl-btn" onclick="prevSlide()">◀ Previous (Left Arrow)</button>
   <span class="slide-counter" id="slideNum">Slide 1 / 10</span>
   <button class="ctrl-btn" onclick="nextSlide()">Next (Right Arrow) ▶</button>
-  <a href="index.html" class="back-btn">➔ Kembali ke Konsolidasi Analyzer App</a>
+  <a href="index.html" class="back-btn">➔ Back to Consolidation Analyzer App</a>
 </div>
 
 <script>
